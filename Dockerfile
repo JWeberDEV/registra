@@ -1,0 +1,50 @@
+# Dockerfile simples para rodar a aplicação
+FROM node:20-alpine
+
+# Instalar dependências do sistema necessárias para compilar pacotes nativos
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    musl-dev \
+    giflib-dev \
+    pixman-dev \
+    pangomm-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+WORKDIR /app
+
+# Copia os arquivos de dependência
+COPY package.json package-lock.json ./
+
+# Instala as dependências
+RUN npm install
+
+# Instala drizzle-kit globalmente
+RUN npm install -g drizzle-kit
+
+# Copia todo o restante do código
+COPY . .
+
+# Copia o script de inicialização do banco
+COPY init.sql /docker-entrypoint-initdb.d/
+
+# Build do frontend/backend
+RUN npm run build
+
+# Exponha a porta padrão
+EXPOSE 5000
+
+# Comando para iniciar a aplicação
+CMD ["npm", "start"]

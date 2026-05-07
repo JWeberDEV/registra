@@ -1,0 +1,37 @@
+chunk-XQLYTHWV.js?v=96ddf196:521 Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
+
+Check the render method of `Primitive.button.SlotClone`.
+    at Badge (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/components/ui/badge.tsx:35:18)
+    at https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…unner/workspace/node_modules/.vite/deps/chunk-T5ONMTIY.js?v=96ddf196:79:13
+    at https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…unner/workspace/node_modules/.vite/deps/chunk-T5ONMTIY.js?v=96ddf196:56:13
+    at https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…unner/workspace/node_modules/.vite/deps/chunk-PNFFIFR5.js?v=96ddf196:42:13
+    at https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…unner/workspace/node_modules/.vite/deps/chunk-RZRK32PF.js?v=96ddf196:83:13
+    at Provider (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…unner/workspace/node_modules/.vite/deps/chunk-AOAYBJFT.js?v=96ddf196:48:15)
+    at Dialog (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…runner/workspace/node_modules/.vite/deps/chunk-RZRK32PF.js?v=96ddf196:48:5)
+    at div
+    at div
+    at div
+    at _c5 (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/components/ui/alert.tsx:80:12)
+    at div
+    at _c (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/components/ui/alert.tsx:35:11)
+    at div
+    at div
+    at MotionComponent (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…nner/workspace/node_modules/.vite/deps/framer-motion.js?v=96ddf196:6536:40)
+    at AdminStickyHeader (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/components/admin/AdminStickyHeader.tsx:27:45)
+    at div
+    at MainLayout (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/layouts/MainLayout.tsx:23:38)
+    at Route (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=96ddf196:323:16)
+    at Switch (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=96ddf196:379:17)
+    at PresenceChild (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…nner/workspace/node_modules/.vite/deps/framer-motion.js?v=96ddf196:7742:24)
+    at AnimatePresence (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…nner/workspace/node_modules/.vite/deps/framer-motion.js?v=96ddf196:7800:26)
+    at Router (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/App.tsx?v=R-epHHQwn7BXPIxAZJUGX:41:22)
+    at Provider (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…unner/workspace/node_modules/.vite/deps/chunk-AOAYBJFT.js?v=96ddf196:48:15)
+    at TooltipProvider (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…rkspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=96ddf196:59:5)
+    at QueryClientProvider (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=96ddf196:2805:3)
+    at App
+    at V (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…e/runner/workspace/node_modules/.vite/deps/next-themes.js?v=96ddf196:44:25)
+    at J (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.…e/runner/workspace/node_modules/.vite/deps/next-themes.js?v=96ddf196:42:18)
+
+chunk-RZRK32PF.js?v=96ddf196:335 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+AdminStickyHeader.tsx:64 
+ POST https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/api/admin/impersonate 400 (Bad Request)

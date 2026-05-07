@@ -1,0 +1,2546 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API de Controle Financeiro",
+    "version": "1.0.0",
+    "description": "API para gerenciamento de finanças pessoais",
+    "contact": {
+      "name": "Suporte",
+      "email": "support@financeiro.app"
+    }
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Servidor de desenvolvimento"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid",
+        "description": "Autenticação via cookie de sessão (para aplicação web)"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "apikey",
+        "description": "Token de acesso à API (para integrações externas)"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token de acesso JWT (para autenticação programática)"
+      }
+    },
+    "schemas": {
+      "Reminder": {
+        "type": "object",
+        "required": [
+          "id",
+          "usuario_id",
+          "titulo",
+          "data_lembrete"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID único do lembrete"
+          },
+          "usuario_id": {
+            "type": "integer",
+            "description": "ID do usuário que criou o lembrete"
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Título do lembrete"
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true,
+            "description": "Descrição detalhada do lembrete (opcional)"
+          },
+          "data_lembrete": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora do lembrete"
+          },
+          "data_criacao": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora de criação do lembrete"
+          },
+          "concluido": {
+            "type": "boolean",
+            "description": "Indica se o lembrete foi concluído",
+            "default": false
+          }
+        },
+        "example": {
+          "id": 1,
+          "usuario_id": 2,
+          "titulo": "Reunião de equipe",
+          "descricao": "Discutir os novos projetos",
+          "data_lembrete": "2025-06-15T14:30:00Z",
+          "data_criacao": "2025-05-16T10:00:00Z",
+          "concluido": false
+        }
+      },
+      "Login": {
+        "type": "object",
+        "required": [
+          "email",
+          "senha"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email do usuário"
+          },
+          "senha": {
+            "type": "string",
+            "format": "password",
+            "description": "Senha do usuário"
+          }
+        },
+        "example": {
+          "email": "usuario@exemplo.com",
+          "senha": "senha123"
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID do usuário"
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome completo do usuário"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email do usuário"
+          },
+          "data_cadastro": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação da conta"
+          },
+          "ultimo_acesso": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data do último acesso"
+          }
+        },
+        "example": {
+          "id": 1,
+          "nome": "João Silva",
+          "email": "joao@exemplo.com",
+          "data_cadastro": "2023-05-01T10:30:00Z",
+          "ultimo_acesso": "2023-05-05T15:20:00Z"
+        }
+      },
+      "Carteira": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID da carteira (auto-gerado)"
+          },
+          "usuario_id": {
+            "type": "integer",
+            "description": "ID do usuário proprietário da carteira"
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome da carteira"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição da carteira"
+          },
+          "saldo_atual": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Saldo atual da carteira"
+          },
+          "data_criacao": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação da carteira"
+          }
+        },
+        "example": {
+          "id": 1,
+          "usuario_id": 2,
+          "nome": "Carteira Principal",
+          "descricao": "Carteira para transações diárias",
+          "saldo_atual": 5000,
+          "data_criacao": "2025-05-01T10:30:00Z"
+        }
+      },
+      "AtualizarCarteira": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Novo nome da carteira"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Nova descrição da carteira"
+          }
+        },
+        "example": {
+          "nome": "Carteira Atualizada",
+          "descricao": "Nova descrição da carteira principal"
+        }
+      },
+      "Categoria": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID da categoria"
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome da categoria"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "Despesa",
+              "Receita"
+            ],
+            "description": "Tipo da categoria (Despesa ou Receita)"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição detalhada da categoria"
+          },
+          "icone": {
+            "type": "string",
+            "description": "Nome do ícone associado à categoria"
+          },
+          "cor": {
+            "type": "string",
+            "description": "Código de cor hexadecimal da categoria"
+          },
+          "global": {
+            "type": "boolean",
+            "description": "Indica se é uma categoria global (disponível para todos) ou pessoal"
+          },
+          "usuario_id": {
+            "type": "integer",
+            "description": "ID do usuário que criou a categoria (null para categorias globais)"
+          }
+        },
+        "example": {
+          "id": 1,
+          "nome": "Alimentação",
+          "tipo": "Despesa",
+          "descricao": "Gastos com alimentação",
+          "icone": "food",
+          "cor": "#FF5722",
+          "global": false,
+          "usuario_id": 2
+        }
+      },
+      "NovaCategoria": {
+        "type": "object",
+        "required": [
+          "nome",
+          "tipo"
+        ],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome da categoria"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "Despesa",
+              "Receita"
+            ],
+            "description": "Tipo da categoria"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição detalhada da categoria"
+          },
+          "icone": {
+            "type": "string",
+            "description": "Nome do ícone"
+          },
+          "cor": {
+            "type": "string",
+            "description": "Código de cor hexadecimal"
+          }
+        },
+        "example": {
+          "nome": "Lazer",
+          "tipo": "Despesa",
+          "descricao": "Gastos com entretenimento e diversão",
+          "icone": "beach",
+          "cor": "#9C27B0"
+        }
+      },
+      "ApiToken": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID do token"
+          },
+          "usuario_id": {
+            "type": "integer",
+            "description": "ID do usuário proprietário do token"
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome/descrição do token"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token de acesso à API (visível apenas na criação)"
+          },
+          "ultimo_acesso": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora do último acesso usando este token"
+          },
+          "ativo": {
+            "type": "boolean",
+            "description": "Status do token (ativo ou revogado)"
+          },
+          "data_criacao": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação do token"
+          }
+        },
+        "example": {
+          "id": 1,
+          "usuario_id": 2,
+          "nome": "Token para Integração ERP",
+          "token": "fin_7a9s8d7f9as87df98as7df9as87df",
+          "ultimo_acesso": "2025-05-10T15:30:00Z",
+          "ativo": true,
+          "data_criacao": "2025-05-01T10:30:00Z"
+        }
+      },
+      "NovoApiToken": {
+        "type": "object",
+        "required": [
+          "nome"
+        ],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome/descrição do token"
+          }
+        },
+        "example": {
+          "nome": "Token para Aplicativo Mobile"
+        }
+      },
+      "Transacao": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID da transação"
+          },
+          "descricao": {
+            "type": "string",
+            "description": "Descrição da transação"
+          },
+          "valor": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Valor da transação"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "Despesa",
+              "Receita"
+            ],
+            "description": "Tipo da transação (Despesa ou Receita)"
+          },
+          "categoria_id": {
+            "type": "integer",
+            "description": "ID da categoria da transação"
+          },
+          "data_transacao": {
+            "type": "string",
+            "format": "date",
+            "description": "Data da transação"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Efetivada",
+              "Pendente",
+              "Agendada",
+              "Cancelada"
+            ],
+            "description": "Status da transação"
+          },
+          "carteira_id": {
+            "type": "integer",
+            "description": "ID da carteira associada à transação"
+          },
+          "data_registro": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de registro no sistema"
+          }
+        },
+        "example": {
+          "id": 1,
+          "descricao": "Supermercado Mensal",
+          "valor": 250.75,
+          "tipo": "Despesa",
+          "categoria_id": 3,
+          "data_transacao": "2025-05-10",
+          "status": "Efetivada",
+          "carteira_id": 1,
+          "data_registro": "2025-05-10T15:30:00Z"
+        }
+      },
+      "NovaTransacao": {
+        "type": "object",
+        "required": [
+          "descricao",
+          "valor",
+          "tipo",
+          "categoria_id",
+          "data_transacao"
+        ],
+        "properties": {
+          "descricao": {
+            "type": "string",
+            "description": "Descrição da transação"
+          },
+          "valor": {
+            "type": "number",
+            "format": "decimal",
+            "description": "Valor da transação"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "Despesa",
+              "Receita"
+            ],
+            "description": "Tipo da transação (Despesa ou Receita)"
+          },
+          "categoria_id": {
+            "type": "integer",
+            "description": "ID da categoria"
+          },
+          "data_transacao": {
+            "type": "string",
+            "format": "date",
+            "description": "Data da transação (YYYY-MM-DD)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Efetivada",
+              "Pendente",
+              "Agendada",
+              "Cancelada"
+            ],
+            "default": "Efetivada",
+            "description": "Status da transação"
+          }
+        },
+        "example": {
+          "descricao": "Almoço Executivo",
+          "valor": 45.9,
+          "tipo": "Despesa",
+          "categoria_id": 3,
+          "data_transacao": "2025-05-10",
+          "status": "Efetivada"
+        }
+      },
+      "CadastroUsuario": {
+        "type": "object",
+        "required": [
+          "nome",
+          "email",
+          "senha"
+        ],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome completo do usuário"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email do usuário (será usado para login)"
+          },
+          "senha": {
+            "type": "string",
+            "format": "password",
+            "description": "Senha do usuário"
+          }
+        },
+        "example": {
+          "nome": "Maria Silva",
+          "email": "maria@exemplo.com",
+          "senha": "senha123"
+        }
+      },
+      "PerfilUsuario": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID do usuário"
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome completo do usuário"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email do usuário"
+          },
+          "data_cadastro": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data de criação da conta"
+          },
+          "ultimo_acesso": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data do último acesso"
+          }
+        },
+        "example": {
+          "id": 1,
+          "nome": "Maria Silva",
+          "email": "maria@exemplo.com",
+          "data_cadastro": "2025-05-01T10:30:00Z",
+          "ultimo_acesso": "2025-05-05T15:20:00Z"
+        }
+      },
+      "AtualizarPerfil": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome completo do usuário"
+          }
+        },
+        "example": {
+          "nome": "Maria Silva de Souza"
+        }
+      },
+      "AlterarSenha": {
+        "type": "object",
+        "required": [
+          "senhaAtual",
+          "novaSenha"
+        ],
+        "properties": {
+          "senhaAtual": {
+            "type": "string",
+            "format": "password",
+            "description": "Senha atual do usuário"
+          },
+          "novaSenha": {
+            "type": "string",
+            "format": "password",
+            "description": "Nova senha do usuário"
+          }
+        },
+        "example": {
+          "senhaAtual": "senha123",
+          "novaSenha": "novaSenha456"
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "cookieAuth": []
+    },
+    {
+      "apiKeyAuth": []
+    },
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Lembretes",
+      "description": "Operações relacionadas aos lembretes do usuário"
+    },
+    {
+      "name": "API Guide",
+      "description": "Guia e documentação para uso da API"
+    },
+    {
+      "name": "Autenticação",
+      "description": "Endpoints para autenticação e gerenciamento de usuários"
+    },
+    {
+      "name": "Carteiras",
+      "description": "API para gerenciamento de carteiras financeiras"
+    },
+    {
+      "name": "Categorias",
+      "description": "API para gerenciamento de categorias de transações"
+    },
+    {
+      "name": "Tokens API",
+      "description": "Gerenciamento de tokens de acesso à API"
+    },
+    {
+      "name": "Transações",
+      "description": "API para gerenciamento de transações financeiras"
+    },
+    {
+      "name": "Usuários",
+      "description": "API para gerenciamento de usuários"
+    },
+    {
+      "name": "Dashboard",
+      "description": "Endpoints para relatórios e resumos financeiros"
+    },
+    {
+      "name": "Relatórios",
+      "description": "Geração e download de relatórios em PDF"
+    }
+  ],
+  "paths": {
+    "/api": {
+      "get": {
+        "summary": "Obtém informações sobre o uso da API",
+        "tags": [
+          "API Guide"
+        ],
+        "responses": {
+          "200": {
+            "description": "Guia de uso da API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Nome da API"
+                    },
+                    "version": {
+                      "type": "string",
+                      "description": "Versão da API"
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "Descrição da API"
+                    },
+                    "endpoints": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "path": {
+                            "type": "string",
+                            "description": "Caminho do endpoint"
+                          },
+                          "methods": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Métodos HTTP suportados"
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "Descrição do endpoint"
+                          }
+                        }
+                      }
+                    },
+                    "authentication": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "Tipo de autenticação"
+                        },
+                        "header": {
+                          "type": "string",
+                          "description": "Nome do cabeçalho para autenticação"
+                        },
+                        "description": {
+                          "type": "string",
+                          "description": "Descrição do método de autenticação"
+                        }
+                      }
+                    },
+                    "documentation": {
+                      "type": "string",
+                      "description": "URL para documentação completa"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Autentica um usuário",
+        "tags": [
+          "Autenticação"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticação bem-sucedida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados de entrada inválidos"
+          },
+          "401": {
+            "description": "Credenciais inválidas"
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "summary": "Obtém o usuário atualmente autenticado",
+        "tags": [
+          "Autenticação"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário autenticado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Encerra a sessão do usuário",
+        "tags": [
+          "Autenticação"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sessão encerrada com sucesso"
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      }
+    },
+    "/wallet/current": {
+      "get": {
+        "summary": "Obtém a carteira principal do usuário autenticado",
+        "tags": [
+          "Carteiras"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados da carteira principal",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carteira"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "404": {
+            "description": "Carteira não encontrada"
+          }
+        }
+      }
+    },
+    "/wallet/{id}": {
+      "get": {
+        "summary": "Obtém uma carteira específica pelo ID",
+        "tags": [
+          "Carteiras"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID da carteira"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados da carteira",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carteira"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (não é proprietário da carteira)"
+          },
+          "404": {
+            "description": "Carteira não encontrada"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Atualiza uma carteira específica pelo ID",
+        "tags": [
+          "Carteiras"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID da carteira"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarCarteira"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Carteira atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carteira"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (não é proprietário da carteira)"
+          },
+          "404": {
+            "description": "Carteira não encontrada"
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "summary": "Obtém todas as categorias disponíveis para o usuário",
+        "tags": [
+          "Categorias"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de categorias",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Categoria"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      },
+      "post": {
+        "summary": "Cria uma nova categoria",
+        "tags": [
+          "Categorias"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NovaCategoria"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Categoria criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Categoria"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      }
+    },
+    "/api/categories/{id}": {
+      "get": {
+        "summary": "Obtém uma categoria específica",
+        "tags": [
+          "Categorias"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID da categoria"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados da categoria",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Categoria"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (categoria pessoal de outro usuário)"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Atualiza uma categoria",
+        "tags": [
+          "Categorias"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID da categoria"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NovaCategoria"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Categoria atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Categoria"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (categoria global ou pertence a outro usuário)"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove uma categoria",
+        "tags": [
+          "Categorias"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID da categoria"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categoria removida com sucesso"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (categoria global ou pertence a outro usuário)"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        }
+      }
+    },
+    "/api/tokens": {
+      "get": {
+        "summary": "Obtém todos os tokens de API do usuário",
+        "tags": [
+          "Tokens API"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiToken"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      },
+      "post": {
+        "summary": "Cria um novo token de API",
+        "tags": [
+          "Tokens API"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NovoApiToken"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Token criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiToken"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      }
+    },
+    "/api/tokens/{id}": {
+      "get": {
+        "summary": "Obtém um token específico pelo ID",
+        "tags": [
+          "Tokens API"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID do token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes do token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiToken"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (token de outro usuário)"
+          },
+          "404": {
+            "description": "Token não encontrado"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Atualiza um token (nome ou status)",
+        "tags": [
+          "Tokens API"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID do token"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nome": {
+                    "type": "string",
+                    "description": "Novo nome/descrição do token"
+                  },
+                  "ativo": {
+                    "type": "boolean",
+                    "description": "Status do token (ativo ou inativo)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiToken"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (token de outro usuário)"
+          },
+          "404": {
+            "description": "Token não encontrado"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Revoga (exclui) um token de API",
+        "tags": [
+          "Tokens API"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID do token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token revogado com sucesso"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (token de outro usuário)"
+          },
+          "404": {
+            "description": "Token não encontrado"
+          }
+        }
+      }
+    },
+    "/transactions": {
+      "get": {
+        "summary": "Obtém todas as transações da carteira atual",
+        "tags": [
+          "Transações"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de transações",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Transacao"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      },
+      "post": {
+        "summary": "Cria uma nova transação",
+        "tags": [
+          "Transações"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NovaTransacao"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Transação criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transacao"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "404": {
+            "description": "Categoria não encontrada"
+          }
+        }
+      }
+    },
+    "/transactions/recent": {
+      "get": {
+        "summary": "Obtém as transações recentes da carteira atual",
+        "tags": [
+          "Transações"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de transações recentes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Transacao"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      }
+    },
+    "/transactions/{id}": {
+      "get": {
+        "summary": "Obtém uma transação específica",
+        "tags": [
+          "Transações"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID da transação"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados da transação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transacao"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (transação de outra carteira)"
+          },
+          "404": {
+            "description": "Transação não encontrada"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Atualiza uma transação",
+        "tags": [
+          "Transações"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID da transação"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NovaTransacao"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transação atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transacao"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (transação de outra carteira)"
+          },
+          "404": {
+            "description": "Transação não encontrada"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove uma transação",
+        "tags": [
+          "Transações"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "ID da transação"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transação removida com sucesso"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado (transação de outra carteira)"
+          },
+          "404": {
+            "description": "Transação não encontrada"
+          }
+        }
+      }
+    },
+    "/users/register": {
+      "post": {
+        "summary": "Registra um novo usuário",
+        "tags": [
+          "Usuários"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CadastroUsuario"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário registrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilUsuario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos ou email já utilizado"
+          }
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "summary": "Obtém o perfil do usuário autenticado",
+        "tags": [
+          "Usuários"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilUsuario"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Atualiza o perfil do usuário autenticado",
+        "tags": [
+          "Usuários"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AtualizarPerfil"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerfilUsuario"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      }
+    },
+    "/users/password": {
+      "post": {
+        "summary": "Altera a senha do usuário autenticado",
+        "tags": [
+          "Usuários"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlterarSenha"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Senha alterada com sucesso"
+          },
+          "400": {
+            "description": "Dados inválidos ou senha atual incorreta"
+          },
+          "401": {
+            "description": "Não autenticado"
+          }
+        }
+      }
+    },
+    "/api/reminders": {
+      "get": {
+        "summary": "Obtém todos os lembretes do usuário atual",
+        "description": "Retorna todos os lembretes cadastrados pelo usuário autenticado",
+        "tags": [
+          "Lembretes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de lembretes do usuário",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reminder"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "500": {
+            "description": "Erro no servidor"
+          }
+        }
+      },
+      "post": {
+        "summary": "Cria um novo lembrete",
+        "description": "Cria um novo lembrete para o usuário autenticado",
+        "tags": [
+          "Lembretes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "titulo",
+                  "data_lembrete"
+                ],
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "description": "Título do lembrete",
+                    "example": "Reunião de equipe"
+                  },
+                  "descricao": {
+                    "type": "string",
+                    "description": "Descrição detalhada do lembrete (opcional)",
+                    "example": "Discutir os novos projetos"
+                  },
+                  "data_lembrete": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Data e hora do lembrete (formato ISO)",
+                    "example": "2025-06-15T14:30:00Z"
+                  },
+                  "concluido": {
+                    "type": "boolean",
+                    "description": "Indica se o lembrete foi concluído (opcional)",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lembrete criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reminder"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "500": {
+            "description": "Erro no servidor"
+          }
+        }
+      }
+    },
+    "/api/reminders/{id}": {
+      "put": {
+        "summary": "Atualiza um lembrete existente",
+        "description": "Atualiza um lembrete específico pertencente ao usuário autenticado",
+        "tags": [
+          "Lembretes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID do lembrete a ser atualizado"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "titulo": {
+                    "type": "string",
+                    "description": "Título do lembrete"
+                  },
+                  "descricao": {
+                    "type": "string",
+                    "description": "Descrição detalhada do lembrete"
+                  },
+                  "data_lembrete": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Data e hora do lembrete (formato ISO)"
+                  },
+                  "concluido": {
+                    "type": "boolean",
+                    "description": "Indica se o lembrete foi concluído"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lembrete atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reminder"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos ou ID inválido"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado - o lembrete não pertence ao usuário"
+          },
+          "404": {
+            "description": "Lembrete não encontrado"
+          },
+          "500": {
+            "description": "Erro no servidor"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Exclui um lembrete existente",
+        "description": "Exclui um lembrete específico pertencente ao usuário autenticado",
+        "tags": [
+          "Lembretes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID do lembrete a ser excluído"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Lembrete excluído com sucesso"
+          },
+          "400": {
+            "description": "ID inválido"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "403": {
+            "description": "Acesso negado - o lembrete não pertence ao usuário"
+          },
+          "404": {
+            "description": "Lembrete não encontrado"
+          },
+          "500": {
+            "description": "Erro no servidor"
+          }
+        }
+      }
+    },
+    "/api/reminders/range": {
+      "get": {
+        "summary": "Obtém lembretes em um intervalo de datas",
+        "description": "Retorna todos os lembretes do usuário dentro do intervalo de datas especificado",
+        "tags": [
+          "Lembretes"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "start_date",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Data de início do intervalo (formato ISO)"
+          },
+          {
+            "in": "query",
+            "name": "end_date",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "Data de fim do intervalo (formato ISO)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de lembretes no intervalo especificado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reminder"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros de consulta inválidos"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "500": {
+            "description": "Erro no servidor"
+          }
+        }
+      }
+    },
+    "/dashboard/summary": {
+      "get": {
+        "summary": "Obtém resumo financeiro do dashboard",
+        "description": "Retorna dados consolidados incluindo resumo mensal, gastos por categoria e totais de receitas/despesas",
+        "tags": [
+          "Dashboard"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resumo financeiro obtido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "monthlyData": {
+                      "type": "array",
+                      "description": "Dados mensais de receitas e despesas",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "month": {
+                            "type": "string",
+                            "description": "Nome do mês"
+                          },
+                          "income": {
+                            "type": "number",
+                            "format": "decimal",
+                            "description": "Total de receitas do mês"
+                          },
+                          "expense": {
+                            "type": "number",
+                            "format": "decimal",
+                            "description": "Total de despesas do mês"
+                          }
+                        }
+                      }
+                    },
+                    "expensesByCategory": {
+                      "type": "array",
+                      "description": "Gastos agrupados por categoria",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "categoryId": {
+                            "type": "integer",
+                            "description": "ID da categoria"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Nome da categoria"
+                          },
+                          "total": {
+                            "type": "number",
+                            "format": "decimal",
+                            "description": "Total gasto na categoria"
+                          },
+                          "color": {
+                            "type": "string",
+                            "description": "Código de cor hexadecimal da categoria"
+                          },
+                          "icon": {
+                            "type": "string",
+                            "description": "Nome do ícone da categoria"
+                          },
+                          "percentage": {
+                            "type": "integer",
+                            "description": "Percentual do total de gastos"
+                          }
+                        }
+                      }
+                    },
+                    "totalIncome": {
+                      "type": "number",
+                      "format": "decimal",
+                      "description": "Total geral de receitas"
+                    },
+                    "totalExpenses": {
+                      "type": "number",
+                      "format": "decimal",
+                      "description": "Total geral de despesas"
+                    }
+                  },
+                  "example": {
+                    "monthlyData": [
+                      {
+                        "month": "Jan",
+                        "income": 3000,
+                        "expense": 1500
+                      },
+                      {
+                        "month": "Feb",
+                        "income": 3200,
+                        "expense": 1800
+                      }
+                    ],
+                    "expensesByCategory": [
+                      {
+                        "categoryId": 1,
+                        "name": "Alimentação",
+                        "total": 450,
+                        "color": "#FF5722",
+                        "icon": "food",
+                        "percentage": 30
+                      }
+                    ],
+                    "totalIncome": 6200,
+                    "totalExpenses": 3300
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "404": {
+            "description": "Carteira não encontrada"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/reports/pdf": {
+      "get": {
+        "summary": "Gera PDF do relatório financeiro",
+        "description": "Cria um PDF com os dados financeiros formatados igual à página de relatórios",
+        "tags": [
+          "Relatórios"
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "URL do PDF gerado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "description": "Status da operação"
+                    },
+                    "downloadUrl": {
+                      "type": "string",
+                      "description": "URL para download do PDF"
+                    },
+                    "filename": {
+                      "type": "string",
+                      "description": "Nome do arquivo PDF"
+                    }
+                  },
+                  "example": {
+                    "success": true,
+                    "downloadUrl": "/api/reports/download/relatorio-financeiro-2024-05-27.pdf",
+                    "filename": "relatorio-financeiro-2024-05-27.pdf"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "404": {
+            "description": "Carteira não encontrada"
+          },
+          "500": {
+            "description": "Erro ao gerar PDF"
+          }
+        }
+      }
+    },
+    "/api/reports/download/{filename}": {
+      "get": {
+        "summary": "Download do arquivo PDF do relatório",
+        "description": "Faz o download do arquivo PDF gerado",
+        "tags": [
+          "Relatórios"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "filename",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Nome do arquivo PDF para download"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Arquivo PDF",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Arquivo não encontrado"
+          }
+        }
+      }
+    },
+    "/api/charts/bar": {
+      "get": {
+        "summary": "Gerar gráfico de barras",
+        "description": "Gera uma imagem PNG com gráfico de barras mostrando receitas vs despesas. Se data não for informada, mostra a semana atual (segunda a domingo). Se data for informada, mostra os últimos 7 dias até a data especificada.",
+        "tags": [
+          "Gráficos"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "description": "Data final para análise (formato YYYY-MM-DD). Se omitido, usa a semana atual. Se informado, mostra os últimos 7 dias até esta data.",
+            "example": "2025-05-30"
+          }
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "URL de download do gráfico gerado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "downloadUrl": {
+                      "type": "string",
+                      "example": "/api/charts/download/chart-receitas-despesas-2025-05-27-abc123.png"
+                    },
+                    "filename": {
+                      "type": "string",
+                      "example": "chart-receitas-despesas-2025-05-27-abc123.png"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "day": {
+                            "type": "string",
+                            "example": "seg"
+                          },
+                          "date": {
+                            "type": "string",
+                            "example": "2025-05-27"
+                          },
+                          "income": {
+                            "type": "number",
+                            "example": 1500.00
+                          },
+                          "expense": {
+                            "type": "number",
+                            "example": 850.00
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Gráfico de barras gerado com sucesso."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "404": {
+            "description": "Carteira não encontrada"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/charts/pizza": {
+      "get": {
+        "summary": "Gerar gráfico de pizza",
+        "description": "Gera uma imagem PNG com gráfico de pizza mostrando despesas por categoria. Se data não for informada, mostra a semana atual (segunda a domingo). Se data for informada, mostra os últimos 7 dias até a data especificada.",
+        "tags": [
+          "Gráficos"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": false,
+            "description": "Data final para análise (formato YYYY-MM-DD). Se omitido, usa a semana atual. Se informado, mostra os últimos 7 dias até esta data.",
+            "example": "2025-05-30"
+          }
+        ],
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "URL de download do gráfico gerado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "downloadUrl": {
+                      "type": "string",
+                      "example": "/api/charts/download/chart-despesas-categoria-2025-05-27-abc123.png"
+                    },
+                    "filename": {
+                      "type": "string",
+                      "example": "chart-despesas-categoria-2025-05-27-abc123.png"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "category": {
+                            "type": "string",
+                            "example": "Alimentação"
+                          },
+                          "amount": {
+                            "type": "number",
+                            "example": 350.50
+                          },
+                          "color": {
+                            "type": "string",
+                            "example": "#ff6b6b"
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Gráfico de pizza gerado com sucesso."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nenhuma despesa encontrada no período"
+          },
+          "401": {
+            "description": "Não autenticado"
+          },
+          "404": {
+            "description": "Carteira não encontrada"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    },
+    "/api/charts/download/{filename}": {
+      "get": {
+        "summary": "Download da imagem do gráfico",
+        "description": "Faz o download da imagem PNG do gráfico gerado",
+        "tags": [
+          "Gráficos"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "filename",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Nome do arquivo PNG para download"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Arquivo PNG do gráfico",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Arquivo não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    }
+  }
+}

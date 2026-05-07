@@ -1,0 +1,29 @@
+Warning: validateDOMNesting(...): <div> cannot appear as a descendant of <p>.
+    at div
+    at Skeleton (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/components/ui/skeleton.tsx:19:3)
+    at p
+    at div
+    at div
+    at div
+    at _c9 (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at MotionComponent (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=8dfd4edd:6536:40)
+    at ReportsPage (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/pages/reports/index.tsx:44:31)
+    at div
+    at main
+    at MotionComponent (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=8dfd4edd:6536:40)
+    at div
+    at MainLayout (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/layouts/MainLayout.tsx:23:38)
+    at Route (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=8dfd4edd:323:16)
+    at Switch (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=8dfd4edd:379:17)
+    at PresenceChild (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=8dfd4edd:7742:24)
+    at AnimatePresence (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=8dfd4edd:7800:26)
+    at Router (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/src/App.tsx?v=6QbsjqJqh9sQt6WdZPjTg:41:22)
+    at Provider (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-PVJ7FW56.js?v=8dfd4edd:48:15)
+    at TooltipProvider (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=8dfd4edd:59:5)
+    at QueryClientProvider (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=8dfd4edd:2805:3)
+    at App
+    at V (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=8dfd4edd:44:25)
+    at J (https://0c2788a2-4c93-4463-8ed6-9bc6321f4ef8-00-2lsb7b8mqj5cw.riker.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/next-themes.js?v=8dfd4edd:42:18)

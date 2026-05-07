@@ -1,0 +1,188 @@
+Preciso que você desenvolva uma aplicação web completa de controle financeiro pessoal utilizando as tecnologias mais adequadas. Abaixo estão os detalhes do projeto:
+Escopo do Projeto
+Desenvolver um sistema de controle financeiro pessoal que permita aos usuários:
+
+Gerenciar uma carteira financeira pessoal
+Registrar transações (despesas e receitas)
+Categorizar transações
+Visualizar resumos e relatórios financeiros
+
+Estrutura do Banco de Dados
+O banco de dados já está configurado no Supabase com as seguintes tabelas:
+
+Usuários: Armazena informações dos usuários
+
+id, remoteJid, nome, email, senha, data_cadastro, ultimo_acesso
+
+
+Carteiras: Uma carteira por usuário
+
+id, usuario_id, nome, descricao, saldo_atual, data_criacao
+
+
+Categorias: Podem ser globais ou personalizadas
+
+id, nome, tipo (Despesa/Receita), cor, icone, usuario_id, global
+
+
+Transações: Registros de débitos e créditos
+
+id, carteira_id, categoria_id, tipo (Despesa/Receita), valor, data_transacao, data_registro, descricao, metodo_pagamento, status
+
+
+
+Requisitos Técnicos
+
+Frontend:
+
+Interface responsiva e intuitiva
+Dashboard com visão geral das finanças
+Formulários para cadastro de transações
+Visualizações gráficas de despesas/receitas
+Filtros por data, categoria, tipo
+Design ultra tecnológico e futurista
+
+
+Backend:
+
+API RESTful para comunicação com o frontend
+Integração com Supabase para autenticação e armazenamento
+Lógica de negócios para cálculos financeiros
+Validações de dados
+
+
+Autenticação:
+
+Sistema de login/registro de usuários
+Proteção de rotas
+Uso do remoteJid como identificador único
+
+
+Funcionalidades Principais:
+
+Cadastro, edição e exclusão de transações
+Visualização de saldo atual
+Relatórios por período e categoria
+Criação de categorias personalizadas
+Filtros e buscas de transações
+
+
+
+Stack Tecnológica Sugerida
+
+Frontend: React.js ou Next.js com Tailwind CSS e Framer Motion para animações
+Backend: Node.js com Express ou Next.js API routes
+Banco de Dados: Supabase (PostgreSQL)
+Autenticação: Supabase Auth
+Gráficos: Recharts, Chart.js ou similar com estilização personalizada
+Hospedagem: Replit
+
+Requisitos Específicos de Design
+Estética Ultra Tecnológica e Futurista
+
+Esquema de Cores:
+
+Paleta principal: roxo (#6C63FF), verde neon (#00FF9D), azul escuro (#1A1A40), preto (#121212)
+Contrastes brilhantes para destacar informações importantes
+Gradientes sutis entre roxo e azul escuro para fundos
+Verde neon para destacar valores positivos/receitas
+Roxo para destacar ações principais
+Cores com alta saturação em elementos interativos
+
+
+Efeitos Visuais Avançados:
+
+Efeito de hover com escala suave (1.02-1.05x) e brilho em cards e botões
+Micro-animações em ícones ao passar o mouse
+Zoom in suave ao selecionar elementos
+Efeitos de parallax no dashboard
+Transições fluidas entre páginas e componentes
+Efeitos de neomorfismo em cards e painéis
+Elementos UI com bordas brilhantes e cantos arredondados
+Sombras de neon sublimes em elementos principais
+
+
+Tipografia e Ícones:
+
+Fonte principal: Inter ou Montserrat para texto normal
+Fonte de destaque: Space Grotesk ou Orbitron para títulos e números
+Ícones personalizados com estilo futurista
+Números grandes e destacados para valores financeiros
+Animações sutis em ícones e textos importantes
+
+
+Componentes Específicos:
+
+Cards de transação com efeito de hover que expande suavemente
+Botões com efeito de brilho ao passar o mouse
+Gráficos com animações de preenchimento
+Dashboard com layout de "cockpit" inspirado em interfaces de ficção científica
+Notificações com efeitos de deslizamento e fade
+Loader personalizado com animação high-tech
+
+
+Layout:
+
+Interface tipo "glass morphism" com fundos escuros
+Grid layout assimétrico e dinâmico
+Navegação fluida com transições suaves
+Elementos "flutuantes" com sombras sutis
+Dashboard inspirado em HUDs de filmes de ficção científica
+
+
+
+Interatividade Avançada
+
+Micro-interações:
+
+Feedback visual instantâneo em todas as ações do usuário
+Efeitos sonoros sutis (opcionais) para ações importantes
+Animações de sucesso personalizadas
+Tooltips elegantes com informações contextuais
+
+
+Visualização de Dados:
+
+Gráficos com efeitos de "glow" nas linhas e pontos
+Animações de entrada e atualização de dados
+Visualizações 3D ou pseudo-3D para dados financeiros
+Transições suaves entre diferentes períodos de tempo
+Efeitos de partículas sutis para destacar pontos de dados importantes
+
+
+
+Detalhes de Implementação
+
+Tecnologias para Efeitos Visuais:
+
+Framer Motion para animações complexas
+GSAP para transições avançadas
+Three.js para elementos 3D (opcional)
+CSS Modules ou Styled Components para estilização avançada
+Tailwind CSS com configuração personalizada para a paleta de cores futurista
+
+
+Performance:
+
+Otimização de animações para evitar impacto no desempenho
+Lazy loading de componentes
+Código limpo e eficiente para manter a experiência fluida
+Considerar a acessibilidade mesmo com design avançado
+
+
+
+Entregáveis Esperados
+
+Código-fonte completo e bem documentado
+Instruções de configuração e execução
+Acesso ao projeto funcional no Replit
+Detalhes de implementação e desafios enfrentados
+
+Inspirações de Design
+
+Interfaces de usuário de filmes como Tron, Blade Runner 2049, Minority Report
+Dashboards de criptomoedas modernos
+Aplicativos financeiros como Revolut, Robinhood (mas com estética mais futurista)
+Websites com prêmios de design com abordagens tecnológicas inovadoras
+
+Por favor, desenvolva esta aplicação considerando a melhor arquitetura e práticas de desenvolvimento para um sistema financeiro pessoal moderno, seguro e de fácil utilização, com ênfase especial na estética ultra tecnológica, visual futurista e interações avançadas que combinam roxo, verde, azul escuro e preto em uma experiência imersiva e sofisticada.

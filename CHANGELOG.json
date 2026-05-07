@@ -1,0 +1,935 @@
+{
+  "currentVersion": "0.0.19",
+  "versions": [
+    {
+      "version": "0.0.19",
+      "date": "2025-01-15",
+      "title": "Colorização de Categorias, Correções de Relatórios e Melhorias de Interface",
+      "description": "Nova ferramenta administrativa para colorização automática de categorias, correção de problemas nos relatórios financeiros, reorganização do painel administrativo e diversas melhorias de interface e usabilidade.",
+      "features": [
+        "Nova ferramenta administrativa 'Colorizar Categorias' no menu lateral de /admin/customize",
+        "Interface dedicada para aplicar cores padrão nas categorias globais do sistema",
+        "Mapeamento automático de cores por tipo de categoria (Alimentação, Transporte, Saúde, etc.)",
+        "Reorganização do menu administrativo com seção dedicada para ferramentas de sistema",
+        "Suporte para configuração personalizada de credenciais administrativas via variáveis de ambiente"
+      ],
+      "improvements": [
+        "Relatórios 'Receitas vs Despesas' e 'Fluxo de Caixa' agora exibem corretamente dados do mês atual",
+        "Conversão automática de nomes de meses do PostgreSQL para português nos gráficos",
+        "Texto do menu 'Personalizar SaaS' alterado para 'Personalizar LOGO' para maior clareza",
+        "Configuração automática de permissões para pastas de upload durante inicialização do sistema",
+        "Melhorada compatibilidade de uploads de logo em ambiente de produção",
+        "Interface administrativa reorganizada com navegação mais intuitiva"
+      ],
+      "fixes": [
+        "Corrigido problema de gráficos vazios nos relatórios devido incompatibilidade de nomes de meses",
+        "Eliminados warnings de validação DOM em componentes de relatórios (Skeleton dentro de <p>)",
+        "Corrigidas permissões de pastas de upload que causavam falhas em produção",
+        "Simplificada lógica de filtro de dados nos relatórios removendo normalizações complexas",
+        "Corrigida estrutura HTML inválida substituindo <p> por <div> onde necessário"
+      ]
+    },
+    {
+      "version": "0.0.18",
+      "date": "2025-09-14",
+      "title": "Correções de Modal, Totais de Pagamento e Animações",
+      "description": "Múltiplas correções importantes na interface e funcionalidades, incluindo correção de contexto de Dialog, totais de formas de pagamento, tema claro em modais e animações de erro com impersonificação.",
+      "features": [
+        "Animação zoom-in bounce de 300ms para modais de erro de impersonificação",
+        "Suporte completo ao tema claro (light mode) na modal de Nova Transação",
+        "Botões de tipo de transação com cores apropriadas para cada tema (light/dark)",
+        "Dropdowns customizados com cores adaptadas ao tema atual",
+        "Remoção da restrição de impersonificação entre administradores"
+      ],
+      "improvements": [
+        "Modal de Nova Transação agora usa fundo branco sólido e bordas cinzas no modo claro",
+        "Botões de Despesa/Receita com cores sólidas no modo claro (vermelho/verde)",
+        "Super admins podem impersonificar qualquer usuário, incluindo outros admins",
+        "Totais de formas de pagamento agora incluem transações com status 'Pendente' e 'Efetivada'",
+        "Animação CSS @keyframes zoomInBounce implementada com duração de 300ms"
+      ],
+      "fixes": [
+        "Corrigido erro 'DialogTitle must be used within Dialog' na modal de transações",
+        "Removidos componentes Dialog (DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose) do TransactionForm",
+        "Substituídos por elementos HTML simples (h2, p, div) para funcionar sem contexto Dialog",
+        "Corrigido problema onde totais de formas de pagamento não apareciam devido ao filtro apenas para transações 'Efetivada'",
+        "Adicionado botão de fechar (X) diretamente na modal de transações com posicionamento absoluto",
+        "Corrigida restrição excessiva de impersonificação que impedia super admins de impersonificar outros admins",
+        "Agora apenas impede auto-impersonificação (usuário tentando impersonificar a si mesmo)"
+      ]
+    },
+    {
+      "version": "0.0.17",
+      "date": "2026-07-01",
+      "title": "Correção de Timezone, Períodos e Cache em Gráficos",
+      "description": "Correções críticas de timezone na API de gráficos, ajuste de períodos para incluir data informada, logs de debug detalhados, nome de arquivo dinâmico para evitar cache e correção de inconsistências de data.",
+      "features": [
+        "Correção definitiva de timezone na API /api/charts/bar para garantir datas corretas",
+        "Ajuste de período: quando informar data, mostra 7 dias terminando na data informada (incluindo a data)",
+        "Quando não informar data, mostra domingo a sábado da semana atual",
+        "Nome de arquivo dinâmico com período incluído para evitar cache",
+        "Logs de debug detalhados para diagnóstico de problemas de data"
+      ],
+      "improvements": [
+        "Comparação de datas robusta usando timestamp local em vez de ISO string",
+        "Filtro de transações por período específico para melhor performance",
+        "Debug detalhado de transações encontradas por dia",
+        "Verificação automática de diferença em dias do período calculado",
+        "Correção de criação de data para evitar problemas de timezone UTC"
+      ],
+      "fixes": [
+        "Corrigido bug onde transações apareciam 1 dia depois da data real",
+        "Corrigido problema de cache em nomes de arquivo de gráficos",
+        "Corrigido cálculo incorreto de período quando data informada",
+        "Corrigido problema de timezone que causava inconsistências de data",
+        "Corrigido comportamento padrão para mostrar semana atual (domingo a sábado)"
+      ]
+    },
+    {
+      "version": "0.0.16",
+      "date": "2026-07-01",
+      "title": "Aprimoramento de Segurança, DDLs, Exclusão em Cascata e Garantia de Integridade",
+      "description": "Inclui instruções SQL para criação manual de MasterToken, DDL para carteira padrão, conferência e garantia de deleção em cascata para todos os dados do usuário, revisão de FKs, instruções de migration para produção e ajustes visuais no Sidebar.",
+      "features": [
+        "Query SQL para criação manual de MasterToken com prefixo fin_ e 32 bytes aleatórios (compatível com lógica do sistema)",
+        "DDL SQL para criação de carteira padrão ao cadastrar usuário manualmente",
+        "Script e instruções para rodar migrations automaticamente em produção (Drizzle ORM)",
+        "Ajuste condicional de padding no Sidebar para admin e não-admin"
+      ],
+      "improvements": [
+        "Conferência e garantia de ON DELETE CASCADE em todas as FKs relacionadas a usuários (carteiras, tokens, formas de pagamento, lembretes, histórico de cancelamentos, impersonação)",
+        "Documentação clara sobre deleção definitiva de usuário e remoção automática de todos os dados relacionados",
+        "Revisão do endpoint de exclusão de usuário para garantir hard delete e deleção em cascata"
+      ],
+      "fixes": [
+        "Correção de possíveis inconsistências em constraints de FKs para garantir integridade referencial",
+        "Ajuste visual no Sidebar para padding dinâmico conforme tipo de usuário"
+      ]
+    },
+    {
+      "version": "0.0.15",
+      "date": "2025-06-30",
+      "title": "Melhorias de Usabilidade, Sidebar, Modais e Visual",
+      "description": "Aprimoramentos significativos na experiência do usuário em modais, sidebar, rodapés, inputs e feedback visual, além de correções de layout e acessibilidade.",
+      "features": [
+        "Modal de erro animada (zoom-in bounce) centralizada, com ícone e mensagem clara para feedback de erros de API",
+        "Modal de Nova Transação centralizada, responsiva, com rolagem vertical invisível e border-radius em mobile",
+        "Header sticky nas modais, sempre visível e com botão de fechar fixo no canto superior direito",
+        "Sidebar com rodapé fixo contendo informações do usuário, botão de logout e versão da build sempre visível",
+        "Versão da build agora clicável no rodapé do sidebar, abrindo modal de changelog igual à tela de login",
+        "Input de telefone no perfil/configurações exibe apenas DDD + número, sem duplicar o country code visual (+55)",
+        "Ajuste automático do input de telefone para aceitar tanto string quanto número, validando e salvando corretamente",
+        "Ajuste de padding, espaçamento e centralização em todos os modais e cards para melhor experiência visual"
+      ],
+      "improvements": [
+        "Remoção de barras de rolagem visíveis em modais, mantendo rolagem funcional e visual limpo",
+        "Fundo sólido e opaco no header sticky das modais, evitando sobreposição de conteúdo ao rolar",
+        "Ajuste do padding e altura do header sticky para eliminar espaços em branco e garantir visual compacto",
+        "Rodapé do sidebar sempre fixo, mesmo com rolagem do menu, e versão da build centralizada",
+        "Ajuste de contraste e cor do texto da versão para garantir visibilidade em todos os temas",
+        "Correção de sobreposição e alinhamento do botão de fechar nas modais",
+        "Aprimoramento do layout do card de usuário no sidebar para melhor legibilidade e responsividade"
+      ],
+      "fixes": [
+        "Correção de bug onde o header sticky ficava transparente e permitia sobreposição de conteúdo ao rolar",
+        "Correção de bug onde o botão de fechar da modal aparecia duplicado ou desalinhado",
+        "Correção de bug onde o telefone era exibido com country code duplicado no perfil",
+        "Correção de bug onde a versão da build não aparecia ou ficava oculta no rodapé do sidebar",
+        "Correção de padding/margem excessivos em modais e sidebar, garantindo visual limpo e sem espaços desnecessários"
+      ]
+    },
+    {
+      "version": "0.0.14",
+      "date": "2025-06-30",
+      "title": "Validação Avançada e Unicidade de Telefone em Usuários",
+      "description": "Implementação completa de campo telefone com máscara, validação, country code, unicidade e UX aprimorada em todos os fluxos de cadastro, edição e perfil de usuário.",
+      "features": [
+        "Campo telefone obrigatório no cadastro e edição de usuários pelo superadmin, com máscara dinâmica e validação em tempo real",
+        "Formatação automática para padrão brasileiro (com DDD) e envio para o backend sempre no formato internacional (country code 55 + DDD + número, apenas números)",
+        "Validação de telefone em todos os fluxos: cadastro, edição pelo admin e atualização de perfil",
+        "Verificação de unicidade: impede cadastro ou atualização de telefone já existente, com mensagem amigável e sem expor dados de terceiros (conforme LGPD/GDPR)",
+        "Mensagem de erro clara e amigável ao tentar cadastrar ou atualizar telefone já utilizado"
+      ],
+      "improvements": [
+        "UX aprimorada no input de telefone: máscara só aparece ao digitar, placeholder limpo e intuitivo",
+        "Validação de 10 ou 11 dígitos no input, sempre convertido para 12 ou 13 dígitos com country code ao salvar",
+        "Campo telefone agora presente e validado também na edição de usuário pelo admin",
+        "Garantia de consistência do formato salvo no banco de dados em todos os fluxos (sempre 55 + DDD + número, apenas números)"
+      ],
+      "fixes": [
+        "Corrigido bug que permitia salvar telefone com caracteres especiais ou sem country code",
+        "Corrigido bug que permitia duplicidade de telefone entre usuários",
+        "Corrigido placeholder exibindo parêntese ao iniciar input vazio"
+      ]
+    },
+    {
+      "version": "0.0.13",
+      "date": "2025-06-29",
+      "title": "Legibilidade Sidebar, Docker e Versionamento Universal",
+      "description": "Aprimoramento visual do card de usuário no sidebar para light mode, correção definitiva do versionamento e changelog em produção Docker.",
+      "features": [
+        "Card de usuário do sidebar com fundo branco, borda clara, nome em cinza escuro e email em cinza médio no light mode",
+        "Botão 'Sair' com fundo cinza claro, texto escuro e ícone de logout contrastante no light mode",
+        "Visual escuro preservado no dark mode"
+      ],
+      "improvements": [
+        "Legibilidade máxima e contraste no card de usuário do sidebar em ambos os temas",
+        "ThemeToggle sempre visível e com contraste adequado"
+      ],
+      "fixes": [
+        "Corrigido problema do arquivo CHANGELOG.json não ser incluído na imagem Docker (removido do .dockerignore)",
+        "Changelog e versionamento agora funcionam em produção e desenvolvimento sem erro de arquivo ausente"
+      ]
+    },
+    {
+      "version": "0.0.12",
+      "date": "2025-06-29",
+      "title": "Ajustes Finais de Contraste, Cores e UX no Admin (Light/Dark)",
+      "description": "Aprimoramento visual e de acessibilidade em todas as áreas administrativas, com contraste máximo, cores consistentes e experiência de usuário refinada tanto no light quanto no dark mode.",
+      "features": [
+        "Cards principais do dashboard com números legíveis em ambos os temas (text-gray-900 no light, text-white no dark)",
+        "Cards de distribuição de carteiras agora coloridos e contrastantes no light mode, igual ao dark mode",
+        "Cabeçalho da aba de distribuição de carteiras com fundo azul claro e textos escuros no light mode",
+        "Consistência visual de cores e bordas nos cards de distribuição para ambos os temas"
+      ],
+      "improvements": [
+        "Textos de faixas, descrições e percentuais dos cards de distribuição com tons de cinza escuros no light mode",
+        "Ajuste de contraste em todos os textos e números de destaque do admin",
+        "Garantia de legibilidade em badges, tabelas, cards e gráficos em todas as páginas administrativas",
+        "Visual colorido e identidade visual mantidos em ambos os temas"
+      ],
+      "fixes": [
+        "Corrigido problema de números ilegíveis nos cards do dashboard em light mode",
+        "Corrigido baixo contraste do cabeçalho e textos azuis na aba de distribuição de carteiras",
+        "Corrigido visual sem cor dos cards de distribuição no light mode"
+      ]
+    },
+    {
+      "version": "0.0.11",
+      "date": "2025-06-28",
+      "title": "Personalização de Logo, UX Avançada e Calendário Mobile",
+      "description": "Upload e remoção de logos customizados (light/dark) com atualização instantânea, borda animada, fallback elegante e preview em todas as áreas do sistema. Calendário de lembretes aprimorado para UX perfeita em desktop e mobile. Removida dependência de banco para logo.",
+      "features": [
+        "Área administrativa para upload, preview e remoção de logos customizados (light/dark)",
+        "Atualização instantânea do logo em todas as áreas do sistema via evento customizado (logo-updated)",
+        "Endpoint backend para upload e remoção de logo sem dependência de banco de dados",
+        "Serviço de logo customizado via /api/logo?theme=light|dark com fallback visual elegante",
+        "Preview do logo com borda animada (gradiente multicolorido spin) e modal de confirmação centralizada",
+        "Aumento do logo na tela de login para pelo menos 230x60px"
+      ],
+      "improvements": [
+        "Borda das caixas de logo com gradiente animado, border-radius de 3px e largura de 1px",
+        "Calendário do campo de data em reminders agora abre como popover/portal acima da modal, centralizado e responsivo",
+        "UX do calendário aprimorada em mobile: sempre visível, centralizado e sem scroll interno na modal",
+        "Fallback visual elegante para ausência de logo customizado"
+      ],
+      "fixes": [
+        "Corrigido erro de require is not defined trocando para import postgres from 'postgres'",
+        "Correção de erro ENOENT criando diretório public/ automaticamente antes do upload do logo",
+        "Removida dependência de banco de dados para upload/remover logo conforme solicitado",
+        "Correção de bug de tabela inexistente orientando a criar migration, depois removido por não usar mais banco"
+      ]
+    },
+    {
+      "version": "0.0.10",
+      "date": "2025-06-27",
+      "title": "Tokens Master, Exclusão Definitiva e UX Avançada",
+      "description": "Implementação de MasterToken automático, exclusão definitiva de usuários com deleção em cascata, melhorias de UX em modais, validação e máscara de telefone, e ajustes de segurança e consistência visual.",
+      "features": [
+        "Criação automática de MasterToken (API) para cada novo usuário, não removível, com rotação segura",
+        "Exibição do MasterToken com ícone de cadeado e modal explicativa, sem opção de remoção",
+        "Botão de rotação do MasterToken preparado para confirmação de senha",
+        "Exclusão definitiva de usuários inativos (hard delete) com deleção em cascata de todos os dados relacionados",
+        "Ícone de lixeira para usuários inativos (exceto super_admin) com modal de confirmação irreversível",
+        "Validação e máscara automática para telefone no perfil, formato (99) 9 9999-9999, com UX aprimorada",
+        "Campo telefone inicia vazio e permite apagar livremente, sem travar na máscara",
+        "Modal de erro de impersonificação centralizada, overlay e z-index garantidos, com toast de feedback",
+        "Instalação automática do drizzle-kit no Dockerfile para ambientes de produção"
+      ],
+      "improvements": [
+        "Constraint única (nome, global) em categorias e formas de pagamento para evitar duplicidade",
+        "Remoção automática de duplicatas de formas de pagamento globais",
+        "Feedback visual consistente em todas as ações administrativas (modais, toasts, overlays)",
+        "Experiência de usuário aprimorada em todos os fluxos críticos do admin",
+        "Ajuste de queries SQL para máxima compatibilidade e performance em deleção em cascata",
+        "Proteção extra para MasterToken e usuários super_admin em ações sensíveis"
+      ],
+      "fixes": [
+        "Correção de bug na deleção em cascata (array SQL e tipagem de carteiras)",
+        "Eliminação de erros de comparação integer = text no PostgreSQL",
+        "Correção de máscara de telefone para permitir apagar sem travar",
+        "Garantia de centralização e sobreposição correta de modais de erro e alerta",
+        "Correção de duplo hash de senha no cadastro via admin"
+      ]
+    },
+    {
+      "version": "0.0.9",
+      "date": "2025-06-26",
+      "title": "Correção de Conexão com Banco de Dados",
+      "description": "Resolução definitiva dos problemas de conexão com banco de dados na inicialização da aplicação, garantindo funcionamento estável do sistema de autenticação e todas as funcionalidades dependentes.",
+      "features": [
+        "Melhorada robustez da conexão inicial com banco PostgreSQL",
+        "Aumentado tempo limite de conexão (15 tentativas com 1 segundo cada)",
+        "Adicionado logging detalhado de erros de conexão para diagnóstico",
+        "Implementada inicialização automática confiável do sistema",
+        "Validação aprimorada de disponibilidade do banco antes da aplicação iniciar",
+        "Sistema automático de criação de tabelas em ambiente de produção",
+        "Detecção inteligente de banco vazio com criação automática da estrutura",
+        "Inserção automática de dados padrão (categorias e formas de pagamento)",
+        "Criação automática de usuário admin em novos deployments",
+        "Guia completo de deployment com troubleshooting"
+      ],
+      "improvements": [
+        "Sistema de autenticação funcionando consistentemente após correção",
+        "Inicialização automática de tabelas e usuário admin garantida",
+        "Logs mais informativos para depuração de problemas de conexão",
+        "Estabilidade aumentada em ambientes com latência de rede variável",
+        "Experiência de usuário melhorada com sistema sempre disponível"
+      ],
+      "fixes": [
+        "Corrigido erro de sintaxe Drizzle ORM na validação de conexão",
+        "Resolvido problema de timeout prematuro na conexão com PostgreSQL",
+        "Eliminadas falhas de autenticação causadas por banco não inicializado",
+        "Corrigida inicialização inconsistente em reinicializações do sistema",
+        "Solucionado problema de usuário admin não disponível após restart"
+      ]
+    },
+    {
+      "version": "0.0.8",
+      "date": "2025-06-26",
+      "title": "Layout Mobile Responsivo e Padronização de Categorias",
+      "description": "Implementação completa de visualização em cards para transações em dispositivos móveis e padronização definitiva do sistema de categorias globais, melhorando significativamente a experiência do usuário e organização do sistema.",
+      "features": [
+        "Layout responsivo com cards para transações em dispositivos móveis (md:hidden)",
+        "Visualização em tabela mantida para desktop (hidden md:block)",
+        "Cards mobile mostram todas as informações sem scroll horizontal",
+        "Cada card inclui ícone de tipo, descrição, método de pagamento, valor, categoria, data e status",
+        "Menu de ações (editar/excluir) preservado nos cards mobile",
+        "Design consistente com tema dark do sistema",
+        "Aplicado tanto na página principal de transações quanto no dashboard",
+        "Padronização completa das categorias globais padrão do sistema",
+        "13 categorias de despesa: Alimentação, Moradia, Doações, Educação, Imposto, Investimento, Lazer, Pets, Saude, Transporte, Vestuário, Viagem, Outros",
+        "4 categorias de receita: Investimentos, Salário, Freelance, Outros",
+        "Sistema de categorias híbrido: globais (todos usuários) + personalizadas (usuário específico)",
+        "Migração automática das categorias existentes para o novo padrão"
+      ],
+      "improvements": [
+        "Experiência mobile significativamente melhorada sem scroll horizontal",
+        "Informações organizadas de forma clara e legível em cards",
+        "Layout adaptativo que se ajusta automaticamente ao tamanho da tela",
+        "Cards com espaçamento adequado e boa hierarquia visual",
+        "Preservação de todas as funcionalidades desktop na versão mobile",
+        "Design moderno e profissional mantendo identidade visual",
+        "Organização padronizada das categorias financeiras para melhor usabilidade",
+        "Separação clara entre categorias globais e personalizadas",
+        "Maior consistência na experiência entre diferentes usuários",
+        "Base sólida para futuras expansões do sistema de categorização"
+      ],
+      "fixes": [
+        "Eliminado problema de scroll horizontal em dispositivos móveis",
+        "Corrigida visualização truncada de informações em telas pequenas",
+        "Resolvido problema de usabilidade da tabela em smartphones",
+        "Melhorada acessibilidade da listagem de transações mobile",
+        "Padronizada estrutura de categorias removendo inconsistências antigas",
+        "Preservadas categorias personalizadas dos usuários durante migração"
+      ]
+    },
+    {
+      "version": "0.0.7",
+      "date": "2025-06-24",
+      "title": "Melhorias de Interface Admin e Posicionamento Mobile",
+      "description": "Correções de posicionamento do header em dispositivos móveis para modo super admin e melhorias na interface administrativa com badges de saldo.",
+      "features": [
+        "Badges de saldo da carteira nas listagens de usuários admin com cores indicativas",
+        "Posicionamento otimizado do header para super admin direto e modo de personificação",
+        "Margem responsiva: 78px para mobile e 75px para desktop quando admin ativo",
+        "Remoção do dropdown de filtro de status na página de transações para interface mais limpa"
+      ],
+      "improvements": [
+        "Header FinanceHub agora fica visível abaixo do header administrativo em mobile",
+        "Espaçamento adequado tanto para super admin direto quanto durante personificação",
+        "Interface de transações simplificada com filtro de status padrão 'TODOS'",
+        "Dashboard admin aprimorado com informações claras de distribuição de carteiras"
+      ],
+      "fixes": [
+        "Corrigido problema de header sobreposto em dispositivos móveis no modo super admin",
+        "Resolvido posicionamento incorreto durante personificação de usuários",
+        "Ajustado espaçamento responsivo para diferentes resoluções de tela"
+      ]
+    },
+    {
+      "version": "0.0.6",
+      "date": "2025-06-23",
+      "title": "Solução Customizada para Posicionamento de Menus",
+      "description": "Implementação de solução customizada para substituir componentes Radix UI problemáticos, resolvendo definitivamente os problemas de posicionamento de menus em categorias, lembretes e dashboard.",
+      "features": [
+        "Menu de ações customizado para categorias com posicionamento absoluto preciso",
+        "Seletor de data customizado para lembretes com z-index elevado para sobreposição de modais",
+        "Menu de ações customizado para transações recentes no dashboard com posicionamento correto",
+        "Sistema de backdrop overlay para detecção de cliques externos em todos os menus",
+        "Controle de eventos otimizado com stopPropagation para funcionamento suave",
+        "Z-index hierárquico garantindo sobreposição correta acima de modais",
+        "Criação do arquivo FIXLAYOUT.md com documentação completa da solução",
+        "Implementação de padrão de menu customizado reutilizável para toda aplicação"
+      ],
+      "improvements": [
+        "Substituição completa de componentes Radix UI problemáticos por soluções nativas",
+        "Posicionamento confiável e consistente em todos os contextos da aplicação",
+        "Performance melhorada sem overhead de bibliotecas complexas",
+        "Visual uniforme respeitando o tema dark da aplicação",
+        "Código mais simples e fácil de manter",
+        "Estrutura CSS robusta com classes utilitárias Tailwind",
+        "Hooks React otimizados para gerenciamento de estado de menus"
+      ],
+      "fixes": [
+        "Corrigido posicionamento incorreto de menus dropdown em categorias",
+        "Resolvido problema de z-index do calendário em modais de lembretes",
+        "Corrigido menu de ações das transações recentes no dashboard",
+        "Eliminados conflitos de sobreposição entre componentes UI",
+        "Corrigido fechamento indevido de menus ao clicar em elementos internos",
+        "Removida opção Carteira da sidebar conforme solicitado",
+        "Adicionada opção Relatórios na sidebar apontando para /reports",
+        "Melhorada seção Distribuição de Carteiras no dashboard admin com critérios claros",
+        "Adicionadas informações sobre distribuição por saldo atual calculado em tempo real"
+      ]
+    },
+    {
+      "version": "0.0.5",
+      "date": "2025-06-20",
+      "title": "Sistema de Sidebar Responsivo Completo",
+      "description": "Implementação completa do sistema de navegação responsivo com melhorias significativas na experiência mobile e correções de arquitetura.",
+      "features": [
+        "Sistema de sidebar responsivo completo para dispositivos móveis",
+        "Header compacto mobile com logo e menu hamburger quando fechado",
+        "Overlay lateral completo quando menu mobile aberto com backdrop",
+        "Auto-fechamento do menu mobile ao navegar entre páginas",
+        "Correção da rota Dashboard para apontar corretamente para raiz (/)",
+        "Remoção da opção duplicada 'Tokens API' do menu lateral",
+        "Reorganização da ordem dos menus - opções de usuário primeiro, admin por último",
+        "Remoção da opção inexistente 'Analytics' do menu administrativo",
+        "Eliminação do cabeçalho mobile duplicado no MainLayout",
+        "Otimização do comportamento responsivo - sidebar desktop oculto em telas menores"
+      ],
+      "improvements": [
+        "Sidebar agora gerencia completamente sua própria navegação mobile",
+        "Melhor separação de responsabilidades entre componentes",
+        "Experiência de usuário mobile significativamente aprimorada",
+        "Navegação mais intuitiva e organizada",
+        "Estrutura de código mais limpa e maintível"
+      ],
+      "fixes": [
+        "Corrigido comportamento do sidebar em resoluções não-desktop",
+        "Removido cabeçalho mobile desnecessário do MainLayout",
+        "Corrigidas importações e dependências desnecessárias",
+        "Solucionados erros de TypeScript em componentes de layout",
+        "Corrigido roteamento da opção Dashboard no menu"
+      ]
+    },
+    {
+      "version": "0.0.4",
+      "date": "2025-06-10",
+      "changes": [
+        {
+          "type": "feat",
+          "description": "Implementado sistema de iconografia tipificada no changelog"
+        },
+        {
+          "type": "feat",
+          "description": "Adicionados badges coloridos para diferentes tipos de alterações (FEAT, FIX, CORE, PATCH)"
+        },
+        {
+          "type": "feat",
+          "description": "Ícones específicos: Plus (verde) para features, Bug (vermelho) para fixes, Settings (azul) para core, Wrench (laranja) para patches"
+        },
+        {
+          "type": "core",
+          "description": "Migração completa do formato de changelog para estrutura tipificada"
+        },
+        {
+          "type": "feat",
+          "description": "Badges de versão aumentados em 30% para melhor hierarquia visual"
+        },
+        {
+          "type": "feat",
+          "description": "Badges de tipo de mudança com tamanho otimizado e border-radius de 3px"
+        },
+        {
+          "type": "feat",
+          "description": "Adicionado campo telefone na aba perfil em configurações"
+        },
+        {
+          "type": "core",
+          "description": "Criada migração para adicionar coluna telefone na tabela usuarios"
+        },
+        {
+          "type": "feat",
+          "description": "Validação de formato de telefone brasileiro no formulário de perfil"
+        },
+        {
+          "type": "core",
+          "description": "Atualizado endpoint de atualização de perfil para suportar telefone"
+        },
+        {
+          "type": "feat",
+          "description": "Adicionado botão de personificação na listagem de usuários em /admin/users"
+        },
+        {
+          "type": "feat",
+          "description": "Funcionalidade de impersonação disponível em todas as abas de usuários (ativos, cancelados, inativos)"
+        },
+        {
+          "type": "core",
+          "description": "Restrição de personificação apenas para usuários não super_admin"
+        },
+        {
+          "type": "feat",
+          "description": "Implementado feedback visual otimista para botões de ativação/desativação de usuários"
+        },
+        {
+          "type": "feat",
+          "description": "Adicionado spinner de carregamento e destaque visual durante alteração de status"
+        },
+        {
+          "type": "feat",
+          "description": "Resposta imediata na interface com reversão automática em caso de erro na API"
+        },
+        {
+          "type": "core",
+          "description": "Melhorada experiência do usuário com transições suaves e feedback instantâneo"
+        },
+        {
+          "type": "feat",
+          "description": "Aplicado feedback visual consistente em todas as abas de usuários (ativos, cancelados, inativos)"
+        },
+        {
+          "type": "feat",
+          "description": "Adicionada coluna de data de cadastro na listagem de usuários administrativos"
+        },
+        {
+          "type": "feat",
+          "description": "Data de cadastro exibida em formato brasileiro (DD/MM/YYYY) em todas as abas de usuários"
+        },
+        {
+          "type": "core",
+          "description": "Separação clara entre informações do usuário: email/transações na primeira linha, cadastro/último acesso na segunda"
+        },
+        {
+          "type": "feat",
+          "description": "Formatação consistente da data de cadastro aplicada nos três tipos de usuários (ativos, cancelados, inativos)"
+        }
+      ]
+    },
+    {
+      "version": "0.0.3",
+      "date": "2025-06-10",
+      "changes": [
+        {
+          "type": "feat",
+          "description": "Adicionada seleção de forma de pagamento nas modais de transação da carteira"
+        },
+        {
+          "type": "feat",
+          "description": "Implementado campo forma_pagamento_id no formulário QuickTransactionForm"
+        },
+        {
+          "type": "feat",
+          "description": "Dropdown customizado para formas de pagamento sem animações"
+        },
+        {
+          "type": "feat",
+          "description": "PIX configurado como forma de pagamento padrão"
+        },
+        {
+          "type": "feat",
+          "description": "Integração completa com API de formas de pagamento"
+        },
+        {
+          "type": "feat",
+          "description": "Salvamento correto do nome da forma de pagamento selecionada"
+        },
+        {
+          "type": "feat",
+          "description": "Adicionado display de versão no rodapé do sidebar"
+        },
+        {
+          "type": "feat",
+          "description": "Modal de changelog acessível através do sidebar em todas as páginas"
+        },
+        {
+          "type": "feat",
+          "description": "Configurado refresh automático dos totais de formas de pagamento"
+        },
+        {
+          "type": "core",
+          "description": "Removido cache das consultas de totais para dados sempre atualizados"
+        },
+        {
+          "type": "core",
+          "description": "Invalidação automática do cache quando transações são modificadas"
+        },
+        {
+          "type": "feat",
+          "description": "Implementado modal de erro centralizado com efeito zoom-in bounce (500ms)"
+        },
+        {
+          "type": "feat",
+          "description": "Adicionado ícone de erro pulsante com gradiente e elementos decorativos"
+        },
+        {
+          "type": "feat",
+          "description": "Criado overlay com desfoque de fundo e animação fade-in suave"
+        },
+        {
+          "type": "feat",
+          "description": "Implementada área de mensagem destacada para melhor legibilidade"
+        },
+        {
+          "type": "feat",
+          "description": "Aprimorado feedback visual durante falhas de personificação"
+        },
+        {
+          "type": "feat",
+          "description": "Adicionadas animações keyframe personalizadas no CSS global"
+        },
+        {
+          "type": "feat",
+          "description": "Melhorada experiência do usuário com notificações toast detalhadas"
+        },
+        {
+          "type": "feat",
+          "description": "Implementado spinner de carregamento durante processamento"
+        },
+        {
+          "type": "feat",
+          "description": "Adicionado logging abrangente para depuração de personificação"
+        },
+        {
+          "type": "feat",
+          "description": "Identificação clara de motivos de falha (usuários inativos)"
+        },
+        {
+          "type": "fix",
+          "description": "Fixed critical cache invalidation issue in admin panel impersonation system"
+        },
+        {
+          "type": "fix",
+          "description": "Enhanced stop impersonation functionality with proper React Query cache management"
+        },
+        {
+          "type": "fix",
+          "description": "Improved admin user list refresh after ending impersonation sessions"
+        },
+        {
+          "type": "fix",
+          "description": "Added comprehensive cache invalidation for all admin-related queries"
+        },
+        {
+          "type": "fix",
+          "description": "Resolved data synchronization issues in administrative interface"
+        },
+        {
+          "type": "fix",
+          "description": "Fixed dashboard loading performance by implementing independent component loading states"
+        },
+        {
+          "type": "fix",
+          "description": "Eliminated 'wait for all data' approach that caused prolonged skeleton displays"
+        },
+        {
+          "type": "core",
+          "description": "Components now render progressively as their individual API calls complete"
+        },
+        {
+          "type": "core",
+          "description": "Improved user experience with faster perceived loading times on main dashboard"
+        }
+      ]
+    },
+    {
+      "version": "0.0.2",
+      "date": "2025-06-10",
+      "changes": [
+        {
+          "type": "fix",
+          "description": "Corrigido alinhamento da coluna de ações na tabela de transações"
+        },
+        {
+          "type": "feat",
+          "description": "Implementado dropdown customizado para ações com posicionamento correto"
+        },
+        {
+          "type": "core",
+          "description": "Aplicada estrutura de alinhamento consistente em todos os filtros"
+        },
+        {
+          "type": "fix",
+          "description": "Removido componente DropdownMenu problemático e substituído por solução customizada"
+        },
+        {
+          "type": "fix",
+          "description": "Menu de ações agora abre corretamente alinhado ao botão (direita)"
+        },
+        {
+          "type": "fix",
+          "description": "Corrigido formulário de transações para salvar forma de pagamento selecionada"
+        },
+        {
+          "type": "feat",
+          "description": "PIX mantido como padrão mas usuário pode alterar para qualquer forma disponível"
+        },
+        {
+          "type": "core",
+          "description": "Implementada lógica para buscar e usar nome da forma de pagamento selecionada"
+        },
+        {
+          "type": "fix",
+          "description": "Corrigida sincronização entre forma_pagamento_id e metodo_pagamento"
+        },
+        {
+          "type": "core",
+          "description": "Melhorada experiência do usuário na seleção de formas de pagamento"
+        }
+      ]
+    },
+    {
+      "version": "0.0.1",
+      "date": "2025-06-09",
+      "changes": [
+        {
+          "type": "feat",
+          "description": "Sistema de versionamento completo implementado com CHANGELOG.json"
+        },
+        {
+          "type": "feat",
+          "description": "Modal de changelog acessível no rodapé da tela de login"
+        },
+        {
+          "type": "core",
+          "description": "Script de incremento automático de versões (increment-version.js)"
+        },
+        {
+          "type": "core",
+          "description": "Endpoint API /api/changelog para buscar histórico de versões"
+        },
+        {
+          "type": "feat",
+          "description": "Componente VersionDisplay para exibir versão atual"
+        },
+        {
+          "type": "core",
+          "description": "Sistema preparado para deploy com versionamento automatizado"
+        },
+        {
+          "type": "feat",
+          "description": "Sistema completo de formas de pagamento com CRUD"
+        },
+        {
+          "type": "feat",
+          "description": "Formas de pagamento globais padrão (PIX, Cartão de Crédito, Débito, Dinheiro)"
+        },
+        {
+          "type": "feat",
+          "description": "Usuários podem criar formas de pagamento personalizadas"
+        },
+        {
+          "type": "feat",
+          "description": "Totais de transações por forma de pagamento no painel"
+        },
+        {
+          "type": "core",
+          "description": "Integração completa com sistema de transações"
+        },
+        {
+          "type": "feat",
+          "description": "Painel administrativo completo para super usuários"
+        },
+        {
+          "type": "feat",
+          "description": "Sistema de impersonificação de usuários"
+        },
+        {
+          "type": "feat",
+          "description": "Estatísticas do sistema (usuários, transações, carteiras)"
+        },
+        {
+          "type": "feat",
+          "description": "Gestão completa de usuários com ativação/desativação"
+        },
+        {
+          "type": "core",
+          "description": "Controle de sessões administrativas com segurança"
+        }
+      ]
+    },
+    {
+      "version": "0.0.0",
+      "date": "2025-06-09",
+      "changes": [
+        {
+          "type": "feat",
+          "description": "Sistema completo de lembretes e notificações"
+        },
+        {
+          "type": "feat",
+          "description": "CRUD de lembretes com datas e descrições"
+        },
+        {
+          "type": "feat",
+          "description": "Interface de calendário para visualização de lembretes"
+        },
+        {
+          "type": "feat",
+          "description": "Notificações de lembretes próximos ao vencimento"
+        },
+        {
+          "type": "feat",
+          "description": "Marcação de lembretes como concluídos"
+        },
+        {
+          "type": "feat",
+          "description": "Sistema de tokens API para integração externa"
+        },
+        {
+          "type": "core",
+          "description": "Geração automática de tokens seguros"
+        },
+        {
+          "type": "feat",
+          "description": "CRUD completo de tokens com permissões"
+        },
+        {
+          "type": "core",
+          "description": "Autenticação via token para endpoints da API"
+        },
+        {
+          "type": "feat",
+          "description": "Documentação Swagger para desenvolvedores"
+        },
+        {
+          "type": "feat",
+          "description": "Dashboard financeiro com gráficos e relatórios"
+        },
+        {
+          "type": "feat",
+          "description": "Resumo mensal de receitas e despesas"
+        },
+        {
+          "type": "feat",
+          "description": "Gráficos de gastos por categoria"
+        },
+        {
+          "type": "feat",
+          "description": "Indicadores de performance financeira"
+        },
+        {
+          "type": "feat",
+          "description": "Cartões de estatísticas em tempo real"
+        },
+        {
+          "type": "feat",
+          "description": "Sistema completo de transações financeiras"
+        },
+        {
+          "type": "feat",
+          "description": "CRUD de transações com validações"
+        },
+        {
+          "type": "feat",
+          "description": "Tipos: Receita e Despesa com status variados"
+        },
+        {
+          "type": "feat",
+          "description": "Filtros avançados por tipo, status, categoria e forma de pagamento"
+        },
+        {
+          "type": "core",
+          "description": "Cálculo automático de saldo da carteira"
+        },
+        {
+          "type": "feat",
+          "description": "Sistema de categorias globais e personalizadas"
+        },
+        {
+          "type": "feat",
+          "description": "Categorias padrão: Alimentação, Transporte, Lazer, etc."
+        },
+        {
+          "type": "feat",
+          "description": "CRUD completo de categorias por usuário"
+        },
+        {
+          "type": "core",
+          "description": "Integração com sistema de transações"
+        },
+        {
+          "type": "core",
+          "description": "Validações e regras de negócio implementadas"
+        },
+        {
+          "type": "feat",
+          "description": "Sistema de carteiras digitais implementado"
+        },
+        {
+          "type": "core",
+          "description": "Uma carteira por usuário com saldo automático"
+        },
+        {
+          "type": "core",
+          "description": "Cálculo de saldo baseado em transações"
+        },
+        {
+          "type": "feat",
+          "description": "Histórico completo de movimentações"
+        },
+        {
+          "type": "feat",
+          "description": "Interface de gestão de carteira"
+        },
+        {
+          "type": "core",
+          "description": "Sistema de autenticação e usuários"
+        },
+        {
+          "type": "feat",
+          "description": "Registro e login com validações"
+        },
+        {
+          "type": "feat",
+          "description": "Tipos de usuário: comum, admin, super_admin"
+        },
+        {
+          "type": "core",
+          "description": "Sessões seguras com express-session"
+        },
+        {
+          "type": "core",
+          "description": "Middleware de autenticação implementado"
+        },
+        {
+          "type": "core",
+          "description": "Estrutura inicial do projeto implementada"
+        },
+        {
+          "type": "core",
+          "description": "Configuração do banco PostgreSQL com Drizzle ORM"
+        },
+        {
+          "type": "core",
+          "description": "Setup do frontend React com TypeScript"
+        },
+        {
+          "type": "core",
+          "description": "Backend Express.js com rotas básicas"
+        },
+        {
+          "type": "core",
+          "description": "Configuração Tailwind CSS e componentes UI"
+        },
+        {
+          "type": "core",
+          "description": "Estrutura de pastas e arquitetura definida"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+=== LOGIN ATTEMPT ===
+Email: teste@teste.com
+Error in login: Error: Client network socket disconnected before secure TLS connection was established
+    at TLSSocket.onConnectEnd (node:_tls_wrap:1732:19)
+    at TLSSocket.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'ECONNRESET',
+  path: undefined,
+  host: undefined,
+  port: undefined,
+  localAddress: undefined
+}
+2:54:14 AM [express] POST /api/auth/login 500 in 42ms :: {"message":"Erro ao fazer login"}
+2:54:21 AM [express] GET /api/auth/me 401 in 1ms :: {"error":"Não autenticado"}
+2:54:21 AM [express] GET /api/auth/me 401 in 1ms :: {"error":"Não autenticado"}
+2:54:21 AM [express] GET /api/auth/me 401 in 1ms :: {"error":"Não autenticado"}
+2:54:21 AM [express] GET /api/changelog 200 in 1ms :: {"currentVersion":"0.0.7","versions":[{"versio…
+
+> rest-express@1.0.0 start
+> NODE_ENV=production node dist/index.js
+
+Documentação Swagger disponível em /docs
+2:55:03 AM [express] serving on port 5000
+npm error path /workspace
+npm error command failed
+npm error signal SIGTERM
+npm error command sh -c NODE_ENV=production node dist/index.js
+npm error A complete log of this run can be found in: /tmp/npm_cache/_logs/2025-06-24T05_53_49_488Z-debug-0.log
+2:55:22 AM [express] GET /api/auth/me 401 in 2ms :: {"error":"Não autenticado"}
+2:55:23 AM [express] GET /api/auth/me 401 in 1ms :: {"error":"Não autenticado"}
+2:55:23 AM [express] GET /api/auth/me 401 in 1ms :: {"error":"Não autenticado"}
+2:55:23 AM [express] GET /api/changelog 200 in 1ms :: {"currentVersion":"0.0.7","versions":[{"versio…
+=== LOGIN ATTEMPT ===
+Email: teste@teste.com
+Error in login: Error: Client network socket disconnected before secure TLS connection was established
+    at TLSSocket.onConnectEnd (node:_tls_wrap:1732:19)
+    at TLSSocket.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'ECONNRESET',
+  path: undefined,
+  host: undefined,
+  port: undefined,
+  localAddress: undefined
+}
+2:55:28 AM [express] POST /api/auth/login 500 in 36ms :: {"message":"Erro ao fazer login"}
+=== LOGIN ATTEMPT ===
+Email: teste@teste.com
+Error in login: Error: Client network socket disconnected before secure TLS connection was established
+    at TLSSocket.onConnectEnd (node:_tls_wrap:1732:19)
+    at TLSSocket.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'ECONNRESET',
+  path: undefined,
+  host: undefined,
+  port: undefined,
+  localAddress: undefined
+}
+2:55:29 AM [express] POST /api/auth/login 500 in 8ms :: {"message":"Erro ao fazer login"}
+=== LOGIN ATTEMPT ===
+Email: teste@teste.com
+Error in login: Error: Client network socket disconnected before secure TLS connection was established
+    at TLSSocket.onConnectEnd (node:_tls_wrap:1732:19)
+    at TLSSocket.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'ECONNRESET',
+  path: undefined,
+  host: undefined,
+  port: undefined,
+  localAddress: undefined
+}
+2:55:30 AM [express] POST /api/auth/login 500 in 9ms :: {"message":"Erro ao fazer login"}
+=== LOGIN ATTEMPT ===
+Email: teste@teste.com
+Error in login: Error: Client network socket disconnected before secure TLS connection was established
+    at TLSSocket.onConnectEnd (node:_tls_wrap:1732:19)
+    at TLSSocket.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'ECONNRESET',
+  path: undefined,
+  host: undefined,
+  port: undefined,
+  localAddress: undefined
+}
+2:55:30 AM [express] POST /api/auth/login 500 in 7ms :: {"message":"Erro ao fazer login"}
+Error in register: Error: Client network socket disconnected before secure TLS connection was established
+    at TLSSocket.onConnectEnd (node:_tls_wrap:1732:19)
+    at TLSSocket.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'ECONNRESET',
+  path: undefined,
+  host: undefined,
+  port: undefined,
+  localAddress: undefined
+}

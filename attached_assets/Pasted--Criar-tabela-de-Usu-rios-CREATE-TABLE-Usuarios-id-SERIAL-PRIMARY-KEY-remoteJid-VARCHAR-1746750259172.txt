@@ -1,0 +1,124 @@
+-- Criar tabela de Usuários
+CREATE TABLE Usuarios (
+    id SERIAL PRIMARY KEY,
+    remoteJid VARCHAR(255) UNIQUE NOT NULL,
+    nome VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    data_cadastro TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    ultimo_acesso TIMESTAMP WITH TIME ZONE
+);
+
+-- Criar tabela de Carteiras
+CREATE TABLE Carteiras (
+    id SERIAL PRIMARY KEY,
+    usuario_id INTEGER NOT NULL REFERENCES Usuarios(id) ON DELETE CASCADE,
+    nome VARCHAR(255) NOT NULL,
+    descricao TEXT,
+    saldo_atual DECIMAL(12, 2) DEFAULT 0.00,
+    data_criacao TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_usuario_carteira UNIQUE (usuario_id)
+);
+
+-- Criar tabela de Categorias
+CREATE TABLE Categorias (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    tipo VARCHAR(10) NOT NULL CHECK (tipo IN ('Despesa', 'Receita')),
+    cor VARCHAR(50),
+    icone VARCHAR(100),
+    usuario_id INTEGER REFERENCES Usuarios(id) ON DELETE CASCADE,
+    global BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT unique_nome_categoria_por_usuario UNIQUE (nome, usuario_id),
+    CONSTRAINT unique_nome_categoria_global UNIQUE (nome) WHERE global = TRUE
+);
+
+-- Criar tabela de Transações
+CREATE TABLE Transacoes (
+    id SERIAL PRIMARY KEY,
+    carteira_id INTEGER NOT NULL REFERENCES Carteiras(id) ON DELETE CASCADE,
+    categoria_id INTEGER NOT NULL REFERENCES Categorias(id) ON DELETE RESTRICT,
+    tipo VARCHAR(10) NOT NULL CHECK (tipo IN ('Despesa', 'Receita')),
+    valor DECIMAL(12, 2) NOT NULL CHECK (valor > 0),
+    data_transacao DATE NOT NULL,
+    data_registro TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    descricao VARCHAR(255) NOT NULL,
+    metodo_pagamento VARCHAR(100),
+    status VARCHAR(20) NOT NULL CHECK (status IN ('Efetivada', 'Pendente', 'Agendada', 'Cancelada')),
+    CONSTRAINT check_categoria_tipo_match CHECK (
+        tipo = (SELECT tipo FROM Categorias WHERE id = categoria_id)
+    )
+);
+
+-- Criar índices para melhor performance
+CREATE INDEX idx_transacoes_carteira ON Transacoes(carteira_id);
+CREATE INDEX idx_transacoes_categoria ON Transacoes(categoria_id);
+CREATE INDEX idx_transacoes_data ON Transacoes(data_transacao);
+CREATE INDEX idx_categorias_usuario ON Categorias(usuario_id) WHERE usuario_id IS NOT NULL;
+CREATE INDEX idx_categorias_global ON Categorias(global) WHERE global = TRUE;
+
+-- Trigger para atualizar o saldo da carteira automaticamente quando uma transação é adicionada, atualizada ou removida
+CREATE OR REPLACE FUNCTION atualizar_saldo_carteira()
+RETURNS TRIGGER AS $$
+DECLARE
+    carteira_id_afetada INTEGER;
+BEGIN
+    -- Determinar qual carteira será afetada
+    IF TG_OP = 'DELETE' THEN
+        carteira_id_afetada := OLD.carteira_id;
+    ELSE
+        carteira_id_afetada := NEW.carteira_id;
+    END IF;
+
+    -- Atualizar o saldo da carteira
+    UPDATE Carteiras
+    SET saldo_atual = (
+        SELECT COALESCE(SUM(CASE WHEN tipo = 'Receita' THEN valor ELSE 0 END), 0) -
+               COALESCE(SUM(CASE WHEN tipo = 'Despesa' THEN valor ELSE 0 END), 0)
+        FROM Transacoes
+        WHERE carteira_id = carteira_id_afetada
+        AND status = 'Efetivada'
+    )
+    WHERE id = carteira_id_afetada;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Criar triggers para manter o saldo da carteira atualizado
+CREATE TRIGGER after_insert_transacao
+AFTER INSERT ON Transacoes
+FOR EACH ROW
+EXECUTE FUNCTION atualizar_saldo_carteira();
+
+CREATE TRIGGER after_update_transacao
+AFTER UPDATE ON Transacoes
+FOR EACH ROW
+WHEN (OLD.valor != NEW.valor OR OLD.tipo != NEW.tipo OR OLD.status != NEW.status OR OLD.carteira_id != NEW.carteira_id)
+EXECUTE FUNCTION atualizar_saldo_carteira();
+
+CREATE TRIGGER after_delete_transacao
+AFTER DELETE ON Transacoes
+FOR EACH ROW
+EXECUTE FUNCTION atualizar_saldo_carteira();
+
+-- Inserir categorias globais padrão
+INSERT INTO Categorias (nome, tipo, cor, icone, global) VALUES
+-- Categorias de Despesas
+('Alimentação', 'Despesa', '#FF5733', 'food', TRUE),
+('Moradia', 'Despesa', '#3498DB', 'home', TRUE),
+('Transporte', 'Despesa', '#F1C40F', 'car', TRUE),
+('Saúde', 'Despesa', '#2ECC71', 'health', TRUE),
+('Educação', 'Despesa', '#9B59B6', 'school', TRUE),
+('Lazer', 'Despesa', '#E67E22', 'entertainment', TRUE),
+('Roupas', 'Despesa', '#1ABC9C', 'clothing', TRUE),
+('Serviços', 'Despesa', '#34495E', 'services', TRUE),
+('Outros Gastos', 'Despesa', '#95A5A6', 'misc-expense', TRUE),
+
+-- Categorias de Receitas
+('Salário', 'Receita', '#27AE60', 'salary', TRUE),
+('Freelance', 'Receita', '#2980B9', 'freelance', TRUE),
+('Investimentos', 'Receita', '#8E44AD', 'investments', TRUE),
+('Presente', 'Receita', '#D35400', 'gift', TRUE),
+('Reembolso', 'Receita', '#7F8C8D', 'refund', TRUE),
+('Outras Receitas', 'Receita', '#16A085', 'misc-income', TRUE);
