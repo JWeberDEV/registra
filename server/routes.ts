@@ -13,6 +13,7 @@ import { setupSwagger } from "./swagger";
 import { initializeWebSocketServer } from "./websocket";
 import { WahaWebhookController } from "./controllers/waha-webhook.controller";
 import { WahaSessionWebhooksController } from "./controllers/waha-session-webhooks.controller";
+import { StripeWebhookController } from "./controllers/stripe-webhook.controller";
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -75,6 +76,11 @@ import * as chartBarController from "./controllers/chart.controller";
 import * as reportController from "./controllers/report-image.controller";
 import * as paymentMethodController from "./controllers/payment-method.controller";
 import { AnalyticsController } from "./controllers/analytics.controller";
+import { StripePaymentController } from "./controllers/stripe-payment.controller";
+import { StripeSubscriptionController } from "./controllers/stripe-subscription.controller";
+import { StripeSetupController } from "./controllers/stripe-setup.controller";
+import { StripeBankSyncController } from "./controllers/stripe-financials.controller";
+import { StripeConnectController } from "./controllers/stripe-connect.controller";
 import { SubscriptionController } from "./controllers/subscription.controller";
 import * as databaseController from "./controllers/database.controller";
 import * as setupController from "./controllers/setup.controller";
@@ -258,6 +264,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     paymentMethodController.deletePaymentMethod,
   );
 
+  // Stripe Payment routes
+  app.post(
+    "/api/payments/intent",
+    combinedAuth,
+    checkImpersonation,
+    StripePaymentController.createPaymentIntent
+  );
+  app.get(
+    "/api/payments/:paymentIntentId/status",
+    combinedAuth,
+    checkImpersonation,
+    StripePaymentController.getPaymentStatus
+  );
+  app.post(
+    "/api/payments/:paymentIntentId/confirm",
+    combinedAuth,
+    checkImpersonation,
+    StripePaymentController.confirmPaymentIntent
+  );
+  app.delete(
+    "/api/payments/:paymentIntentId",
+    combinedAuth,
+    checkImpersonation,
+    StripePaymentController.cancelPayment
+  );
+
   // Rota duplicada removida - agora está no topo
 
   // Dashboard summary
@@ -343,6 +375,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
     checkImpersonation,
     requireSuperAdmin,
     notificationController.sendTestNotification,
+  );
+
+  // Stripe Subscriptions routes
+  app.post(
+    "/api/subscriptions/create",
+    combinedAuth,
+    checkImpersonation,
+    StripeSubscriptionController.createSubscription
+  );
+  app.get(
+    "/api/subscriptions",
+    combinedAuth,
+    checkImpersonation,
+    StripeSubscriptionController.listSubscriptions
+  );
+  app.get(
+    "/api/subscriptions/:subscriptionId",
+    combinedAuth,
+    checkImpersonation,
+    StripeSubscriptionController.getSubscription
+  );
+  app.put(
+    "/api/subscriptions/:subscriptionId/plan",
+    combinedAuth,
+    checkImpersonation,
+    StripeSubscriptionController.updatePlan
+  );
+  app.delete(
+    "/api/subscriptions/:subscriptionId",
+    combinedAuth,
+    checkImpersonation,
+    StripeSubscriptionController.cancelSubscription
+  );
+  app.post(
+    "/api/subscriptions/:subscriptionId/resume",
+    combinedAuth,
+    checkImpersonation,
+    StripeSubscriptionController.resumeSubscription
+  );
+
+  // Stripe Setup Intent routes (Saved Cards)
+  app.post(
+    "/api/payment-methods/setup-intent",
+    combinedAuth,
+    checkImpersonation,
+    StripeSetupController.createSetupIntent
+  );
+  app.post(
+    "/api/payment-methods/confirm-setup",
+    combinedAuth,
+    checkImpersonation,
+    StripeSetupController.confirmSetupIntent
+  );
+  app.get(
+    "/api/payment-methods/saved",
+    combinedAuth,
+    checkImpersonation,
+    StripeSetupController.listPaymentMethods
+  );
+  app.put(
+    "/api/payment-methods/:paymentMethodId/default",
+    combinedAuth,
+    checkImpersonation,
+    StripeSetupController.setDefaultPaymentMethod
+  );
+  app.post(
+    "/api/payment-methods/charge-saved",
+    combinedAuth,
+    checkImpersonation,
+    StripeSetupController.chargeWithSavedCard
+  );
+
+  // Stripe Bank Sync routes
+  app.post(
+    "/api/bank/register",
+    combinedAuth,
+    checkImpersonation,
+    StripeBankSyncController.registerAccount
+  );
+  app.get(
+    "/api/bank/connected",
+    combinedAuth,
+    checkImpersonation,
+    StripeBankSyncController.getConnectedStatus
+  );
+  app.post(
+    "/api/bank/sync",
+    combinedAuth,
+    checkImpersonation,
+    StripeBankSyncController.syncManually
+  );
+  app.post(
+    "/api/bank/disconnect",
+    combinedAuth,
+    checkImpersonation,
+    StripeBankSyncController.disconnectAccount
+  );
+
+  // Stripe Connect routes (Marketplace)
+  app.post(
+    "/api/connect/create",
+    combinedAuth,
+    checkImpersonation,
+    StripeConnectController.createAccount
+  );
+  app.get(
+    "/api/connect/onboarding-link",
+    combinedAuth,
+    checkImpersonation,
+    StripeConnectController.generateOnboardingLink
+  );
+  app.get(
+    "/api/connect/status",
+    combinedAuth,
+    checkImpersonation,
+    StripeConnectController.getStatus
+  );
+  app.post(
+    "/api/connect/calculate-fee",
+    combinedAuth,
+    checkImpersonation,
+    StripeConnectController.calculateFee
+  );
+
+  // Stripe Webhook routes - sem autenticação, validação via assinatura
+  // IMPORTANTE: Usar express.raw() para preservar body como string para validação de assinatura
+  app.post(
+    "/api/webhooks/stripe",
+    express.raw({ type: "application/json" }),
+    StripeWebhookController.handleWebhook
   );
 
   // WAHA Webhook routes - sem autenticação para receber eventos externos
