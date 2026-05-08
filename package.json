@@ -15,7 +15,8 @@
     "db:push": "node scripts/db-push-confirm.cjs",
     "db:seed": "node scripts/seed-globals.cjs",
     "db:seed-planos": "node scripts/seed-planos.cjs",
-    "dev:windows": "set NODE_ENV=development&& tsx server/index.ts"
+    "dev:windows": "set NODE_ENV=development&& tsx server/index.ts",
+    "start:windows": "set NODE_ENV=production&& node --env-file=.env dist/index.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
