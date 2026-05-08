@@ -48,7 +48,7 @@ export const categories = pgTable("categorias", {
   usuario_id: integer("usuario_id").references(() => users.id, { onDelete: 'cascade' }),
   global: boolean("global").notNull().default(false)
 }, (table) => [
-  unique().on(table.nome, table.global)
+  unique().on(table.nome, table.tipo, table.global)
 ]);
 
 // Payment Methods table
@@ -288,6 +288,26 @@ export const reminders = pgTable("lembretes", {
   data_criacao: timestamp("data_criacao", { withTimezone: true }).default(sql`(CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo')`),
   concluido: boolean("concluido").default(false)
 });
+
+// Planos (Subscription Plans) table
+// Catálogo local de planos disponíveis. O Stripe é a fonte de verdade dos
+// preços, mas este catálogo permite que o frontend liste planos válidos
+// e que o backend valide stripe_price_id antes de criar a subscription.
+export const planos = pgTable("planos", {
+  id: serial("id").primaryKey(),
+  nome: varchar("nome", { length: 100 }).notNull(),
+  descricao: text("descricao"),
+  intervalo_meses: integer("intervalo_meses").notNull(),
+  valor_usd: decimal("valor_usd", { precision: 10, scale: 2 }).notNull(),
+  stripe_price_id: varchar("stripe_price_id", { length: 255 }).notNull().unique(),
+  stripe_product_id: varchar("stripe_product_id", { length: 255 }),
+  ativo: boolean("ativo").notNull().default(true),
+  ordem: integer("ordem").notNull().default(0),
+  data_criacao: timestamp("data_criacao", { withTimezone: true }).default(sql`(CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo')`)
+});
+
+export type Plano = typeof planos.$inferSelect;
+export type InsertPlano = typeof planos.$inferInsert;
 
 // User Sessions Admin table (for impersonation control)
 export const userSessionsAdmin = pgTable("user_sessions_admin", {

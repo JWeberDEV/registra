@@ -928,7 +928,7 @@ export async function createUser(req: Request, res: Response) {
     console.log("Super Admin:", req.user?.email);
     console.log("===============================");
 
-    const { nome, email, senha, tipo_usuario = "usuario", telefone } = req.body;
+    const { nome, email, senha, tipo_usuario = "usuario", telefone, data_expiracao_assinatura } = req.body;
 
     // Validação de telefone (opcional, mas se fornecido deve ser válido)
     if (telefone && telefone.trim() !== "") {
@@ -970,7 +970,7 @@ export async function createUser(req: Request, res: Response) {
 
     console.log("Criando usuário no banco...");
     // Remover hash manual da senha, deixar storage.createUser hashear
-    const userData = {
+    const userData: any = {
       nome,
       email,
       senha, // senha em texto puro
@@ -978,6 +978,13 @@ export async function createUser(req: Request, res: Response) {
       ativo: true,
       telefone // incluir telefone se fornecido
     };
+
+    // Aceitar data de expiração no momento da criação. String vazia ou
+    // ausente = assinatura ilimitada (NULL no banco).
+    if (data_expiracao_assinatura && String(data_expiracao_assinatura).trim() !== "") {
+      userData.data_expiracao_assinatura = new Date(data_expiracao_assinatura);
+    }
+
     console.log("User data:", { ...userData, senha: "***" });
 
     const newUser = await storage.createUser(userData);

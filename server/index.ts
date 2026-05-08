@@ -30,6 +30,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { validateAndInitializeDatabase, waitForDatabase } from "./startup";
 import { setupRedirect } from "./middleware/setup.middleware";
+import { initializeStripe, cleanupStripe } from "./stripe-startup";
 
 // Configurar timezone global da aplicação para São Paulo
 process.env.TZ = 'America/Sao_Paulo';
@@ -138,9 +139,13 @@ app.use((req, res, next) => {
     console.log('🚀 Inicializando aplicação...');
     await waitForDatabase();
     await validateAndInitializeDatabase();
+    
+    // Inicializar Stripe
+    await initializeStripe();
+    
     console.log('✅ Aplicação inicializada com sucesso!');
   } catch (error) {
-    console.error('❌ Falha na inicialização do banco:', error);
+    console.error('❌ Falha na inicialização:', error);
     console.log('⚠️ Continuando sem inicialização automática...');
   }
 
