@@ -1,5 +1,5 @@
-import { validateStripeConfig } from '../config/stripe';
-import { StripeBankSyncService } from '../services/stripe-financial-sync.service';
+import { validateStripeConfig } from './config/stripe';
+import { StripeBankSyncService } from './services/stripe-financial-sync.service';
 
 /**
  * Inicializar configurações do Stripe na startup
