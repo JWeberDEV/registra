@@ -74,6 +74,7 @@ import * as chartController from "./controllers/chart-svg.controller";
 import * as chartBarController from "./controllers/chart.controller";
 import * as reportController from "./controllers/report-image.controller";
 import * as paymentMethodController from "./controllers/payment-method.controller";
+import * as planosController from "./controllers/planos.controller";
 import { AnalyticsController } from "./controllers/analytics.controller";
 import { StripePaymentController } from "./controllers/stripe-payment.controller";
 import { StripeSubscriptionController } from "./controllers/stripe-subscription.controller";
@@ -504,6 +505,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "/api/webhooks/stripe",
     express.raw({ type: "application/json" }),
     StripeWebhookController.handleWebhook
+  );
+
+  // Planos (CRUD) — listagem pública (autenticada) e gestão restrita a super_admin
+  app.get("/api/planos", combinedAuth, planosController.listPlanosAtivos);
+  app.get(
+    "/api/planos/all",
+    combinedAuth,
+    requireSuperAdmin,
+    planosController.listAllPlanos
+  );
+  app.get("/api/planos/:id", combinedAuth, planosController.getPlano);
+  app.post(
+    "/api/planos",
+    combinedAuth,
+    requireSuperAdmin,
+    planosController.createPlano
+  );
+  app.put(
+    "/api/planos/:id",
+    combinedAuth,
+    requireSuperAdmin,
+    planosController.updatePlano
+  );
+  app.delete(
+    "/api/planos/:id",
+    combinedAuth,
+    requireSuperAdmin,
+    planosController.deletePlano
   );
 
   // WAHA Webhook routes - sem autenticação para receber eventos externos

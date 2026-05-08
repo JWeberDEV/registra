@@ -28,6 +28,7 @@ interface CreateUserForm {
   senha: string;
   tipo_usuario: "usuario" | "admin" | "super_admin";
   telefone?: string;
+  data_expiracao_assinatura?: string;
 }
 
 interface UpdateUserForm {
@@ -99,7 +100,8 @@ export default function AdminUsers() {
     email: "",
     senha: "",
     tipo_usuario: "usuario",
-    telefone: ""
+    telefone: "",
+    data_expiracao_assinatura: ""
   });
 
   const [editForm, setEditForm] = useState<UpdateUserForm>({
@@ -424,6 +426,28 @@ export default function AdminUsers() {
     return <Badge className={`${theme === 'light' ? 'bg-emerald-400 text-white' : ''}`} variant={theme === 'light' ? undefined : 'default'}>Ativo</Badge>;
   };
 
+  // Badge mostrando data de expiração do plano. Cores:
+  //   - cinza: sem data (assinatura ilimitada)
+  //   - vermelho: já expirado
+  //   - laranja: expira em <= 7 dias
+  //   - verde: expira em > 7 dias
+  const getExpirationBadge = (user: UserWithStats) => {
+    if (!user.data_expiracao_assinatura) {
+      return <Badge variant="secondary" className="text-xs bg-gray-500 text-white">Sem expiração</Badge>;
+    }
+    const exp = new Date(user.data_expiracao_assinatura);
+    const now = new Date();
+    const diffDays = Math.ceil((exp.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    const dataFmt = exp.toLocaleDateString('pt-BR');
+    if (diffDays < 0) {
+      return <Badge className="text-xs bg-red-600 text-white">Expirado em {dataFmt}</Badge>;
+    }
+    if (diffDays <= 7) {
+      return <Badge className="text-xs bg-orange-500 text-white">Expira em {dataFmt}</Badge>;
+    }
+    return <Badge className="text-xs bg-emerald-600 text-white">Expira em {dataFmt}</Badge>;
+  };
+
   const formatLastAccess = (date: string | Date | null) => {
     if (!date) return "Nunca";
     const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -556,6 +580,19 @@ export default function AdminUsers() {
                 </div>
                 
                 <div className="admin-user-form-group">
+                  <label className="admin-user-form-label">Data de Expiração da Assinatura</label>
+                  <input
+                    type="date"
+                    value={createForm.data_expiracao_assinatura || ""}
+                    onChange={(e) => setCreateForm(prev => ({ ...prev, data_expiracao_assinatura: e.target.value }))}
+                    className="admin-user-form-input"
+                  />
+                  <div className="text-xs text-gray-400 mt-1">
+                    Deixe em branco para assinatura ilimitada
+                  </div>
+                </div>
+
+                <div className="admin-user-form-group">
                   <label className="admin-user-form-label">Telefone</label>
                   <PhoneInput
                     value={createForm.telefone || ""}
@@ -668,6 +705,7 @@ export default function AdminUsers() {
                           <div className="flex items-center gap-2">
                             <h3 className={`font-medium ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>{user.nome}</h3>
                             {getStatusBadge(user)}
+                            {getExpirationBadge(user)}
                             {getTipoUsuarioBadge(user.tipo_usuario)}
                             {getWalletBalanceBadge(user.walletBalance || 0)}
                           </div>
@@ -766,6 +804,7 @@ export default function AdminUsers() {
                           <div className="flex items-center gap-2">
                             <h3 className="font-medium text-white">{user.nome}</h3>
                             {getStatusBadge(user)}
+                            {getExpirationBadge(user)}
                             {getTipoUsuarioBadge(user.tipo_usuario)}
                             {getWalletBalanceBadge(user.walletBalance || 0)}
                           </div>
@@ -867,6 +906,7 @@ export default function AdminUsers() {
                           <div className="flex items-center gap-2">
                             <h3 className="font-medium text-white">{user.nome}</h3>
                             {getStatusBadge(user)}
+                            {getExpirationBadge(user)}
                             {getTipoUsuarioBadge(user.tipo_usuario)}
                             {getWalletBalanceBadge(user.walletBalance || 0)}
                           </div>
