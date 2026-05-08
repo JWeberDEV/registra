@@ -242,11 +242,17 @@ export class StripeEventService {
         (event.current_period_end ?? 0) * 1000
       );
 
-      // Inserir assinatura no banco
+      // Inserir assinatura no banco (idempotente: ON CONFLICT atualiza)
       await storage.query(
-        `INSERT INTO "stripe_subscriptions" 
+        `INSERT INTO "stripe_subscriptions"
         (usuario_id, stripe_subscription_id, stripe_product_id, stripe_price_id, status, valor_mensal, data_proximo_pagamento)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        ON CONFLICT (stripe_subscription_id) DO UPDATE
+          SET status = EXCLUDED.status,
+              stripe_product_id = EXCLUDED.stripe_product_id,
+              stripe_price_id = EXCLUDED.stripe_price_id,
+              valor_mensal = EXCLUDED.valor_mensal,
+              data_proximo_pagamento = EXCLUDED.data_proximo_pagamento`,
         [
           usuarioId,
           subscriptionId,
@@ -257,6 +263,30 @@ export class StripeEventService {
           dataPróximoPagamento,
         ]
       );
+
+      // Ativar plano do usuário: data_expiracao_assinatura = current_period_end.
+      // Só ativa se a subscription estiver em estado "saudável".
+      // Estados que NÃO ativam: incomplete, incomplete_expired, unpaid, past_due (antes do pagamento).
+      const statusAtivos = ['active', 'trialing'];
+      if (statusAtivos.includes(event.status as string)) {
+        await storage.query(
+          `UPDATE "usuarios"
+          SET status_assinatura = 'ativa',
+              data_expiracao_assinatura = $1,
+              ativo = true,
+              data_cancelamento = NULL,
+              motivo_cancelamento = NULL
+          WHERE id = $2`,
+          [dataPróximoPagamento, usuarioId]
+        );
+        console.log(
+          `🔓 User ${usuarioId} subscription ACTIVATED until ${dataPróximoPagamento.toISOString()}`
+        );
+      } else {
+        console.log(
+          `⏸ Subscription ${subscriptionId} created with non-active status: ${event.status} — user not yet activated`
+        );
+      }
 
       await this.logWebhookEvent(
         event.id,
@@ -276,20 +306,21 @@ export class StripeEventService {
   }
 
   /**
-   * Handle customer.subscription.deleted - Marcar assinatura como cancelada
+   * Handle customer.subscription.updated - Sincronizar renovações e mudanças
+   * de plano. Atualiza data_expiracao_assinatura no usuário (renovação) e
+   * trata transições de status (active → past_due → canceled etc).
    */
-  static async handleCustomerSubscriptionDeleted(
+  static async handleCustomerSubscriptionUpdated(
     event: SubscriptionWebhookEvent
   ): Promise<void> {
     try {
       const subscriptionId = event.id;
       const stripeCustumerId = event.customer;
 
-      if (!subscriptionId) {
-        throw new Error('No subscription ID in event');
+      if (!subscriptionId || !stripeCustumerId) {
+        throw new Error('Missing subscription or customer ID');
       }
 
-      // Buscar usuário
       const usuario = await storage.query(
         `SELECT id FROM "usuarios" WHERE stripe_customer_id = $1 LIMIT 1`,
         [stripeCustumerId]
@@ -304,12 +335,128 @@ export class StripeEventService {
 
       const usuarioId = usuario.rows[0].id;
 
-      // Atualizar assinatura
+      const priceId = event.items?.data?.[0]?.price?.id;
+      const productId = event.items?.data?.[0]?.price?.product;
+      const status = (event.status as string) || 'active';
+      const dataPróximoPagamento = new Date(
+        (event.current_period_end ?? 0) * 1000
+      );
+
+      // Atualizar registro de subscription
       await storage.query(
-        `UPDATE "stripe_subscriptions" 
+        `UPDATE "stripe_subscriptions"
+        SET status = $1,
+            stripe_product_id = COALESCE($2, stripe_product_id),
+            stripe_price_id = COALESCE($3, stripe_price_id),
+            data_proximo_pagamento = $4
+        WHERE stripe_subscription_id = $5`,
+        [status, productId, priceId, dataPróximoPagamento, subscriptionId]
+      );
+
+      // Sincronizar status do usuário com o status do Stripe
+      const statusAtivos = ['active', 'trialing'];
+      const statusBloqueados = ['canceled', 'unpaid', 'incomplete_expired'];
+
+      if (statusAtivos.includes(status)) {
+        // Renovação ou retomada: estender expiração e garantir ativo
+        await storage.query(
+          `UPDATE "usuarios"
+          SET status_assinatura = 'ativa',
+              data_expiracao_assinatura = $1,
+              ativo = true
+          WHERE id = $2`,
+          [dataPróximoPagamento, usuarioId]
+        );
+        console.log(
+          `🔄 User ${usuarioId} subscription RENEWED until ${dataPróximoPagamento.toISOString()}`
+        );
+      } else if (statusBloqueados.includes(status)) {
+        // Pagamento falhou ou foi cancelado: marcar como cancelada mas
+        // respeitar a data de expiração atual (acesso até o fim do período)
+        await storage.query(
+          `UPDATE "usuarios"
+          SET status_assinatura = 'cancelada'
+          WHERE id = $1`,
+          [usuarioId]
+        );
+        console.log(
+          `⚠️ User ${usuarioId} subscription status changed to: ${status}`
+        );
+      } else if (status === 'past_due') {
+        // Stripe tentará cobrar de novo. Não bloqueia ainda, mas sinaliza.
+        console.log(
+          `⏰ User ${usuarioId} subscription is PAST_DUE — Stripe will retry`
+        );
+      }
+
+      await this.logWebhookEvent(
+        event.id,
+        'customer.subscription.updated',
+        usuarioId,
+        undefined,
+        event as unknown as Record<string, unknown>
+      );
+
+      console.log(
+        `✅ Subscription updated: ${subscriptionId} (status=${status})`
+      );
+    } catch (error) {
+      console.error(`❌ Error handling customer.subscription.updated:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Handle customer.subscription.deleted - Cancelar assinatura e bloquear
+   * acesso do usuário ao final do período corrente.
+   */
+  static async handleCustomerSubscriptionDeleted(
+    event: SubscriptionWebhookEvent
+  ): Promise<void> {
+    try {
+      const subscriptionId = event.id;
+      const stripeCustumerId = event.customer;
+
+      if (!subscriptionId) {
+        throw new Error('No subscription ID in event');
+      }
+
+      const usuario = await storage.query(
+        `SELECT id FROM "usuarios" WHERE stripe_customer_id = $1 LIMIT 1`,
+        [stripeCustumerId]
+      );
+
+      if (usuario.rows.length === 0) {
+        console.warn(
+          `⚠️ User not found for stripe customer: ${stripeCustumerId}`
+        );
+        return;
+      }
+
+      const usuarioId = usuario.rows[0].id;
+
+      // Atualizar registro de subscription
+      await storage.query(
+        `UPDATE "stripe_subscriptions"
         SET status = 'canceled', data_cancelamento = NOW()
         WHERE stripe_subscription_id = $1`,
         [subscriptionId]
+      );
+
+      // Determinar data de expiração: respeitar current_period_end se existir,
+      // caso contrário expirar imediatamente.
+      const periodEnd = event.current_period_end
+        ? new Date(event.current_period_end * 1000)
+        : new Date();
+
+      await storage.query(
+        `UPDATE "usuarios"
+        SET status_assinatura = 'cancelada',
+            data_expiracao_assinatura = $1,
+            data_cancelamento = NOW(),
+            motivo_cancelamento = COALESCE(motivo_cancelamento, 'Cancelado via Stripe')
+        WHERE id = $2`,
+        [periodEnd, usuarioId]
       );
 
       await this.logWebhookEvent(
@@ -320,7 +467,9 @@ export class StripeEventService {
         event as unknown as Record<string, unknown>
       );
 
-      console.log(`✅ Subscription canceled: ${subscriptionId}`);
+      console.log(
+        `🚫 Subscription canceled: ${subscriptionId} — user ${usuarioId} access until ${periodEnd.toISOString()}`
+      );
     } catch (error) {
       console.error(
         `❌ Error handling customer.subscription.deleted:`,

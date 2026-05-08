@@ -66,8 +66,10 @@ export class StripeWebhookController {
       });
 
       // Processar evento de forma síncrona
-      // Erros aqui não serão retornados ao Stripe, mas serão logados
-      await this.processEvent(event);
+      // Erros aqui não serão retornados ao Stripe, mas serão logados.
+      // Nota: usar referência explícita à classe (não `this`) porque o
+      // método é passado como callback ao Express e perde o binding.
+      await StripeWebhookController.processEvent(event);
 
       return res;
     } catch (error) {
@@ -113,6 +115,12 @@ export class StripeWebhookController {
         // Subscription events
         case 'customer.subscription.created':
           await StripeEventService.handleCustomerSubscriptionCreated(
+            eventData as Record<string, unknown>
+          );
+          break;
+
+        case 'customer.subscription.updated':
+          await StripeEventService.handleCustomerSubscriptionUpdated(
             eventData as Record<string, unknown>
           );
           break;
